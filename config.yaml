@@ -39,11 +39,19 @@ menu:
       url: 'https://github.com/nishipy'
       params:
         icon: brand-github
+      weight: -100
     - identifier: twitter
       name: Twitter
       url: 'https://twitter.com/iamnishipy'
       params:
         icon: brand-twitter
+      weight: 1
+    - identifier: linkedin
+      name: Linkenin
+      url: 'https://www.linkedin.com/in/takuya-nishimura'
+      params:
+        icon: brand-linkedin
+      weight: 2
     
 
 params:
@@ -89,5 +97,3 @@ params:
   # comments:
   #     enabled: true
   #     provider: disqus
-
-
