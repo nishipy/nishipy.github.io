@@ -1,7 +1,7 @@
 theme: hugo-theme-stack
 baseURL: https://nishipy.github.io
 languageCode: en-us
-title: Nishipy Notes
+title: nishipy notes
 
 params:
   favicon: /images/favicon.ico
