@@ -3,16 +3,74 @@ baseURL: https://nishipy.github.io
 languageCode: en-us
 title: nishipy notes
 
+# languages:
+#   ja:
+#     languageName: Japanese
+#     weight: 1    
+#   en:
+#     languageName: English
+#     weight: 2
+
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: -100
+      params:
+        icon: home
+        newtab: true
+  social:
+    - identifier: github
+      name: GitHub
+      url: 'https://github.com/nishipy'
+      params:
+        icon: brand-github
+    - identifier: twitter
+      name: Twitter
+      url: 'https://twitter.com/iamnishipy'
+      params:
+        icon: brand-twitter
+
 params:
   favicon: /images/favicon.ico
   sidebar:
-      emoji: 🐈
-      avatar:
-          enabled: true
-          local: false
-          src: /images/favicon.ico
+    emoji: 🐈
+    avatar:
+      enabled: true
+      local: false
+      src: /images/favicon.ico
   article:
-      math: true
+    math: true
+    readingTime: true
+    license:
+      enabled: false
+      default: Licensed under CC BY-NC-SA 4.0
+  opengraph:
+    enabled: true
+    src: /images/favicon.ico
+    twitter:
+      card: summrary
+      site: iamnishipy
+  widgets:
+    homepage:
+      - type: search
+      - type: archives
+        params:
+          limit: 5
+      - type: categories
+        params:
+          limit: 10
+      - type: tag-cloud
+        params:
+          limit: 10
+    page:
+      - type: toc
   footer:
-      since: 2018
-      customText:
+    since: 2018
+    customText:
+  # comments:
+  #     enabled: true
+  #     provider: disqus
+
+
