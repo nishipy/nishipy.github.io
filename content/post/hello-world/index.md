@@ -2,6 +2,7 @@
 title: "Hello World"
 date: 2023-01-09T12:47:43+09:00
 draft: false
+slug: hello-world
 categories:
   - hello-world
 tags:
@@ -13,7 +14,7 @@ tags:
 
 おそろしく速い手刀、オレでなきゃ見逃しちゃうね
 
-### A person who do not miss it
+### A person who does not miss that
 
 ```
 Such terrifying speed. No one except me could have seen that.

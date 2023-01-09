@@ -3,32 +3,36 @@ baseURL: https://nishipy.github.io
 languageCode: en-us
 title: nishipy notes
 
-redirects:
-- force: true
-  from: /ja/
-  status: 200
-  to: https://nishipy.com
-
 languages:
   en:
     languageName: English
     weight: 1
     title: nishipy notes
-  ja:
-    languageName: Japanese
-    weight: 2
-    title: nishipy notes
-
 
 menu:
   main:
     - identifier: home
       name: Home
       url: /
-      weight: -100
+      weight: -200
       params:
         icon: home
         newtab: false
+    - identifier: blog
+      name: Posts in Japanese
+      url: https://nishipy.com
+      weight: -190
+      params:
+        icon: language
+        newtab: true
+    - identifier: about
+      name: About
+      url: /page/about
+      weight: -100
+      params:
+        icon: user
+        newtab: false
+
   social:
     - identifier: github
       name: GitHub
@@ -40,6 +44,7 @@ menu:
       url: 'https://twitter.com/iamnishipy'
       params:
         icon: brand-twitter
+    
 
 params:
   favicon: /images/favicon.ico
