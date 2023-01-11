@@ -14,17 +14,17 @@ menu:
     - identifier: home
       name: Home
       url: /
-      weight: -200
+      weight: -190
       params:
         icon: home
         newtab: false
-    - identifier: blog
-      name: Posts in Japanese
-      url: https://nishipy.com
-      weight: -190
-      params:
-        icon: language
-        newtab: true
+    # - identifier: blog
+    #   name: Posts in Japanese
+    #   url: https://nishipy.com
+    #   weight: -200
+    #   params:
+    #     icon: language-jp-en
+    #     newtab: true
     - identifier: about
       name: About
       url: /page/about
@@ -36,23 +36,22 @@ menu:
   social:
     - identifier: github
       name: GitHub
-      url: 'https://github.com/nishipy'
+      url: "https://github.com/nishipy"
       params:
         icon: brand-github
       weight: -100
     - identifier: twitter
       name: Twitter
-      url: 'https://twitter.com/iamnishipy'
+      url: "https://twitter.com/iamnishipy"
       params:
         icon: brand-twitter
       weight: 1
-    - identifier: linkedin
-      name: Linkenin
-      url: 'https://www.linkedin.com/in/takuya-nishimura'
+    - identifier: posts-in-japanese
+      name: Blog
+      url: "https://nishipy.com"
       params:
-        icon: brand-linkedin
+        icon: language-jp-en
       weight: 2
-    
 
 params:
   favicon: /images/favicon.ico
