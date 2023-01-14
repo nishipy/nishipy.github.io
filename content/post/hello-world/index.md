@@ -4,9 +4,9 @@ date: 2023-01-09T12:47:43+09:00
 draft: false
 slug: hello-world
 categories:
-  - category:hello-world
+  - general
 tags:
-  - tag:hello-world
+  - hello-world
 # image: cover.jpg
 ---
 
