@@ -96,3 +96,7 @@ params:
   # comments:
   #     enabled: true
   #     provider: disqus
+
+permalinks:
+    post: /p/:slug/
+    page: /:slug/
