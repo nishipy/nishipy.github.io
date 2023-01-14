@@ -71,7 +71,7 @@ params:
     enabled: true
     src: /images/favicon.ico
     twitter:
-      card: summrary
+      card: summary
       site: iamnishipy
   colorScheme:
     toggle: true
@@ -98,5 +98,5 @@ params:
   #     provider: disqus
 
 permalinks:
-    post: /p/:slug/
-    page: /:slug/
+  post: /p/:slug/
+  page: /:slug/
