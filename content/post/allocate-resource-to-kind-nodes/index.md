@@ -1,6 +1,6 @@
 ---
 title: "Resource allocation to Kind nodes "
-date: 2023-01-14T12:04:42+09:00
+date: 2023-01-21T10:51:42+09:00
 draft: false
 categories:
   - kubernetes
@@ -18,7 +18,7 @@ There are some famous tools to create local Kubernetes clusters. [Kind](https://
 
 When using Kind, each node of a Kubernetes cluster is built as a Docker container. Therefore, first, configure the resources available to Docker in the Docker Desktop settings. Set them to about 4 CPU cores and 8GB of memory, for instance.
 
-![](./docker-desktop-resources.png)
+![](docker-desktop-resources.png)
 
 
 ## Create a Kind configuration file
