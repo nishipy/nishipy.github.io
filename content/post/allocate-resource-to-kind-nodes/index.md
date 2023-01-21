@@ -28,7 +28,7 @@ Next, we create a configuration file for Kind. You can get a general idea by loo
 ### Define multiple nodes in a cluster
 For now, we will try to configure one Master and one Worker. All we need to do is to define the list under the `nodes`.
 
-```
+```yaml
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -60,6 +60,13 @@ nodes:
       kubeletExtraArgs:
         system-reserved: memory=4Gi
 ```
+
+<script async="" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display: block; text-align: center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4768526216432204" data-ad-slot="6600235709"></ins>
+<script><br />	 	 
+ (adsbygoogle = window.adsbygoogle || []).push({});<br />	 	 
+</script>
+
 
 ### Create a cluster with the configuration file
 
