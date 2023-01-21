@@ -27,7 +27,7 @@ menu:
     #     newtab: true
     - identifier: about
       name: About
-      url: /page/about
+      url: /about/
       weight: -100
       params:
         icon: user
