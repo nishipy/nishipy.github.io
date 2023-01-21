@@ -19,12 +19,12 @@ data-flex-basis="385px"
 >Configuring Your kind Cluster&lt;/a> in the documentation. It is a brief description of the cluster.&lt;/p>
 &lt;h3 id="define-multiple-nodes-in-a-cluster">Define multiple nodes in a cluster&lt;/h3>
 &lt;p>For now, we will try to configure one Master and one Worker. All we need to do is to define the list under the &lt;code>nodes&lt;/code>.&lt;/p>
-&lt;pre tabindex="0">&lt;code>kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-&lt;/code>&lt;/pre>&lt;h3 id="define-resources-for-nodes">Define resources for nodes&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">kind&lt;/span>: &lt;span style="color:#ae81ff">Cluster&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">apiVersion&lt;/span>: &lt;span style="color:#ae81ff">kind.x-k8s.io/v1alpha4&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">nodes&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#f92672">role&lt;/span>: &lt;span style="color:#ae81ff">control-plane&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#f92672">role&lt;/span>: &lt;span style="color:#ae81ff">worker&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="define-resources-for-nodes">Define resources for nodes&lt;/h3>
 &lt;p>According to &lt;a class="link" href="https://github.com/kubernetes-sigs/kind/issues/1524" target="_blank" rel="noopener"
 >this issue&lt;/a>, you can define the resource allocation since the Kind cluster is created with &lt;a class="link" href="https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/" target="_blank" rel="noopener"
 >kubeadm&lt;/a>. However, it does not seem to be a formal method, as you can find a comment like &amp;ldquo;kubelet configuration object is not respected per node in kubeadm currently, only from init&amp;rdquo;.&lt;/p>
@@ -45,7 +45,11 @@ nodes:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> nodeRegistration:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> kubeletExtraArgs:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74"> system-reserved: memory=4Gi&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="create-a-cluster-with-the-configuration-file">Create a cluster with the configuration file&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;!-- raw HTML omitted -->
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;!-- raw HTML omitted -->
+&lt;h3 id="create-a-cluster-with-the-configuration-file">Create a cluster with the configuration file&lt;/h3>
 &lt;p>Use &lt;code>--config&lt;/code> option to specify the configuration file.&lt;/p>
 &lt;pre tabindex="0">&lt;code>$ kind create cluster --name=demo --config=$HOME/kind-config.yaml
 Creating cluster &amp;#34;demo&amp;#34; ...
