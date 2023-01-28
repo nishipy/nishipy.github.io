@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pleg on nishipy notes</title><link>https://nishipy.github.io/tags/pleg/</link><description>Recent content in pleg on nishipy notes</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 28 Jan 2023 13:50:47 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/tags/pleg/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code (1/2)</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/</link><pubDate>Sat, 28 Jan 2023 13:50:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/pleg.png" alt="Featured image of post Understanding PLEG with source code (1/2)" />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1958" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pleg on nishipy notes</title><link>https://nishipy.github.io/tags/pleg/</link><description>Recent content in pleg on nishipy notes</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 28 Jan 2023 13:50:47 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/tags/pleg/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code - Part 1</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/</link><pubDate>Sat, 28 Jan 2023 13:50:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 1" />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1958" target="_blank" rel="noopener"
 >「kubeletのPLEGをソースコード読んで理解したかった」&lt;/a>.
 &lt;a class="link" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/" target="_blank" rel="noopener"
 >Kubelet&lt;/a> has a lot of components, and one of the most important ones is PLEG, which stands for &amp;ldquo;Pod Lifecycle Event Generator&amp;rdquo;. In this article, we&amp;rsquo;ll look into the implementation to understand how PLEG works.&lt;/p>
@@ -14,10 +14,10 @@
 >here&lt;/a>.&lt;/p>
 &lt;p>It seems to be responsible for talking to Container Runtime and the main loop of kubelet, as shown below.&lt;/p>
 &lt;blockquote>
-&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/pleg.png"
+&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg.png"
 width="1206"
 height="886"
-srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_1024x0_resize_box_3.png 1024w"
+srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="136"
@@ -42,10 +42,10 @@ cited from: &lt;a class="link" href="https://github.com/kubernetes/design-propos
 The design proposal is &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md" target="_blank" rel="noopener"
 >here&lt;/a>.&lt;/p>
 &lt;blockquote>
-&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/runtimepodcache.png"
+&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache.png"
 width="1214"
 height="942"
-srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-1/2/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_1024x0_resize_box_3.png 1024w"
+srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="128"
