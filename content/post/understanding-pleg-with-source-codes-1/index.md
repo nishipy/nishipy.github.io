@@ -1,5 +1,5 @@
 ---
-title: "Understanding PLEG with source code (1/2)"
+title: "Understanding PLEG with source code - Part 1"
 date: 2023-01-28T13:50:47+09:00
 draft: false
 categories:
