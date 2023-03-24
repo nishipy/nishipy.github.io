@@ -12,7 +12,7 @@ tags:
 image: pleg.png
 ---
 
-For the goal of this series or abstract of the PLEGP and so on, please refer to the previous post [Understanding PLEG with source code - Part 1]({{< ref "/content/post/understanding-pleg-with-source-codes-1/index.md" >}} ).
+For the goal of this series or abstract of the PLEG and so on, please refer to the previous post [Understanding PLEG with source code - Part 1]({{< ref "/content/post/understanding-pleg-with-source-codes-1/index.md" >}} ).
 Now, let's read the source code of PLEG! Note that the source code in the following part comes from [`Kubernetes 1.25`](https://github.com/kubernetes/kubernetes/tree/release-1.25).
 
 ## pkg/kubelet/pleg/pleg.go
