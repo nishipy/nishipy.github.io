@@ -6,6 +6,7 @@ categories:
   - kubernetes
 tags:
   - kubernetes
+  - openshift
   - kubelet
   - pleg
 image: pleg.png
