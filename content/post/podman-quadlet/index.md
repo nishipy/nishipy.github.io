@@ -1,7 +1,7 @@
 ---
 title: "Quadletイン・アクション"
-date: 2023-12-17T00:00:00+09:00
-draft: true
+date: 2023-11-17T00:00:00+09:00
+draft: false
 categories:
   - podman
 tags:
