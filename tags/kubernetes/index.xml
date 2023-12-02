@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>kubernetes on nishipy notes</title><link>https://nishipy.github.io/tags/kubernetes/</link><description>Recent content in kubernetes on nishipy notes</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 24 Mar 2023 09:32:47 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code - Part 2</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</link><pubDate>Fri, 24 Mar 2023 09:32:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 2" />&lt;p>For the goal of this series or abstract of the PLEG and so on, please refer to the previous post &lt;a class="link" href="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/" >Understanding PLEG with source code - Part 1&lt;/a>.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>kubernetes on /home/nishipy</title><link>https://nishipy.github.io/tags/kubernetes/</link><description>Recent content in kubernetes on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 24 Mar 2023 09:32:47 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code - Part 2</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</link><pubDate>Fri, 24 Mar 2023 09:32:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 2" />&lt;p>For the goal of this series or abstract of the PLEG and so on, please refer to the previous post &lt;a class="link" href="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/" >Understanding PLEG with source code - Part 1&lt;/a>.
 Now, let&amp;rsquo;s read the source code of PLEG! Note that the source code in the following part comes from &lt;a class="link" href="https://github.com/kubernetes/kubernetes/tree/release-1.25" target="_blank" rel="noopener"
 >&lt;code>Kubernetes 1.25&lt;/code>&lt;/a>.&lt;/p>
 &lt;h2 id="pkgkubeletplegpleggo">pkg/kubelet/pleg/pleg.go&lt;/h2>
@@ -689,8 +689,8 @@ loading="lazy"
 class="gallery-image"
 data-flex-grow="136"
 data-flex-basis="326px"
->
-cited from: &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview" target="_blank" rel="noopener"
+>&lt;/p>
+&lt;p>cited from: &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview" target="_blank" rel="noopener"
 >https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview&lt;/a>&lt;/p>
 &lt;/blockquote>
 &lt;h3 id="relisting-in-pleg">Relisting in PLEG&lt;/h3>
@@ -717,8 +717,8 @@ loading="lazy"
 class="gallery-image"
 data-flex-grow="128"
 data-flex-basis="309px"
->
-cited from: &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md#runtime-pod-cache" target="_blank" rel="noopener"
+>&lt;/p>
+&lt;p>cited from: &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md#runtime-pod-cache" target="_blank" rel="noopener"
 >https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md#runtime-pod-cache&lt;/a>&lt;/p>
 &lt;/blockquote>
 &lt;p>The diagram is almost the same as the one we saw for PLEG, but a box named &amp;ldquo;pod cache&amp;rdquo; is added between PLEG and Pod Workers.&lt;/p>
