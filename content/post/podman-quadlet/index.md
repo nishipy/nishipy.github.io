@@ -1,6 +1,6 @@
 ---
 title: "Quadletイン・アクション"
-date: 2023-11-27T13:50:47+09:00
+date: 2023-12-17T00:00:00+09:00
 draft: true
 categories:
   - podman
@@ -14,38 +14,39 @@ slug: podman-quadlet
 
 Header Photo by [Amy Asher](https://unsplash.com/@amyannaasher?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/white-seal-on-soil-giZJHm2m9yY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
 
-## 🦭 < はじめに
+## 🦭 はじめに
 
 [Red Hat Advent Calendar 2023](https://qiita.com/advent-calendar/2023/redhat) 17日目の記事🎅です。
 ちなみにすべて [個人の見解](https://xn--u9jy52g42am02luma.jp/) です。
 
-## 🦭 < `podman-generate-systemd` の非推奨化と Quadlet
+## 🦭 `podman-generate-systemd` の非推奨化と Quadlet
 
-システム起動時にコンテナも起動したい等のユースケースで、systemdサービスとしてPodmanコンテナやPodを制御したい場合、従来は [`podman-generate-systemd`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html) を使って、既存のコンテナやPodからsystemdユニットファイルを生成していました。2023年に発売された書籍[Podmanイン・アクション](https://www.shuwasystem.co.jp/book/9784798070209.html)([Podman in Action](https://www.manning.com/books/podman-in-action)をFedora 38/Podman v4.5.1を前提に日本語訳したもの) の「7章 systemdとの統合」でも、この方法を紹介しています。
+エッジ等のユースケースで、systemdのサービスユニットとしてPodmanコンテナやPodを制御したい場合、従来は [`podman generate systemd`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html) というコマンドを使って、既存のコンテナやPodからユニットファイルを生成していました。2023年9月に発売された書籍[Podmanイン・アクション](https://www.shuwasystem.co.jp/book/9784798070209.html)([Podman in Action](https://www.manning.com/books/podman-in-action)をFedora 38/Podman v4.5.1を前提に日本語訳したもの) の「7章 systemdとの統合」でも、この方法を紹介しています。
 
 ![](podman-in-action-jp.jpeg)
 
-Podman v4.7.0 で、この [`podman-generate-systemd`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)　はdeprecated(非推奨)となりました。systemdのもとでコンテナやPodを実行したい場合、Quadlet の使用が推奨されています。[Podman v4.7.0 のリリースノート](https://github.com/containers/podman/releases/tag/v4.7.0)に以下の記載があります。
+Podman v4.7.0 で、この [`podman generate systemd](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html) はdeprecated(非推奨)となりました。systemdのもとでPodmanコンテナやPodを実行したい場合は、[Podman v4.7.0 のリリースノート](https://github.com/containers/podman/releases/tag/v4.7.0)に記載がある通り、[Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html) を使うことが推奨されています。以下の記載があります。
 
 > The podman generate systemd command is deprecated. Use Quadlet for running containers and pods under systemd.
 
-## 🦭 < Quadlet を完全に理解する
+## 🦭 Quadlet を完全に理解する
 
-### Quadlet と Podman
-Quadletは、Podmanコンテナをsystemdのもとでいい感じに実行できるようにするツールであり、もともとPodmanとは別のリポジトリ [containers/quadlet](https://github.com/containers/quadlet) で開発されていました。その後Podman v4.4で [containers/podman](https://github.com/containers/podman/tree/main) 内の [pkg/systemd](https://github.com/containers/podman/tree/main/pkg/systemd/quadlet) の下にマージされています。[Podman v4.4.0 のリリースノート](https://github.com/containers/podman/releases/tag/v4.4.0)には以下の記載があります。
+### QuadletとPodman
+
+[Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)は、PodmanコンテナやPodをsystemdのもとでいい感じに実行できるようにするためのツールであり、もともとPodmanとは別のリポジトリ [containers/quadlet](https://github.com/containers/quadlet) で開発されていました。その後Podman v4.4で [containers/podman](https://github.com/containers/podman/tree/main) 内の [pkg/systemd](https://github.com/containers/podman/tree/main/pkg/systemd/quadlet) の下にマージされています。[Podman v4.4.0 のリリースノート](https://github.com/containers/podman/releases/tag/v4.4.0)には以下の記載があります。
 > Introduce Quadlet, a new systemd-generator that easily writes and maintains systemd services using Podman.
 
-### Quadlet は systemd の generator の1つ
+### Quadletはsystemdのgenerator
 
-そもそもQuadletとは何なんでしょうか。Quadletの作者であるAlexander Larssonさんのブログ[`Quadlet, an easier way to run system containers`](https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/)には、以下のように書かれています。また、[`podman-systemd.unit` のドキュメント](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)も参照してださい。
+そもそもQuadletとは何なんでしょうか。Quadletの作者であるAlexander Larssonさんのブログ[`Quadlet, an easier way to run system containers`](https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/)には、以下のように書かれています。また、[`podman-systemd.unit` のドキュメント](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)もあわせて参照してださい。
 
 > Quadlet is a systemd generator that takes a container description and automatically generates a systemd service file from it.
 
-つまるところ、Quadletはsystemd generatorです。generatorの概要は、[`systemd.generator(7)` のman page](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html)などに詳しく説明されています。ChatGPTくんに要約してもらいました。
+つまるところ、Quadletはsystemdのgeneratorの１つです。generatorについては、[`systemd.generator(7)`](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html)のman pageに詳しく説明されています。ChatGPTくんに頼んで要約してもらいましょう。
 
-> **(ChatGPT):** ジェネレータは、systemdの一部で、システムの起動時や設定再読み込み時に実行され、ユニットファイルがロードされる前に動的にユニットファイルやシンボリックリンクを生成する役割を持つ。ジェネレータは、特定のディレクトリに配置され、システム設定を拡張・上書きし、ユニットファイルの階層を拡張する。優先度の違うディレクトリに出力し、systemctl daemon-reloadで前の設定を消去し、ジェネレータを再実行してsystemdがユニットを再読み込む。
+> **(ChatGPTくん🤖):** ジェネレータは、systemdの一部で、システムの起動時や設定再読み込み時に実行され、ユニットファイルがロードされる前に動的にユニットファイルやシンボリックリンクを生成する役割を持つ。ジェネレータは、特定のディレクトリに配置され、システム設定を拡張・上書きし、ユニットファイルの階層を拡張する。優先度の違うディレクトリに出力し、systemctl daemon-reloadで前の設定を消去し、ジェネレータを再実行してsystemdがユニットを再読み込む。
 
-わかった気になれたところで、[systemd.generatorのExamples](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html#Examples)を見てみましょう。個人的にわかりやすかった `Example 1. systemd-fstab-generator` を抜粋します。Quadletと同じくgeneratorの1つである [`systemd-fstab-generator`](https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html#) が、`/etc/fstab` の内容をもとにsystemdユニットファイルを生成してくれているんですね。
+わかった気になれたところで、[man pageのExamples](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html#Examples)を見てみましょう。ここでは最も馴染み深いであろう `Example 1. systemd-fstab-generator` を取り上げます。Quadletと同じくgeneratorの1つである [`systemd-fstab-generator`](https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html#) が、`/etc/fstab` の内容をもとにユニットファイルを生成してくれています。
 
 > **Example 1. systemd-fstab-generator**
 > 
@@ -53,7 +54,7 @@ Quadletは、Podmanコンテナをsystemdのもとでいい感じに実行でき
 > 
 > After editing /etc/fstab, the user should invoke systemctl daemon-reload. This will re-run all generators and cause systemd to reload units from disk. To actually mount new directories added to fstab, systemctl start /path/to/mountpoint or systemctl start local-fs.target may be used.
 
-Quadletに話を戻しましょう。手元のFedora CoreOS 39な環境で、ユーザー用のgeneratorが置かれるディレクトリ `/usr/lib/systemd/user-generators/` を覗いてみると、確かに `/usr/lib/systemd/user-generators/podman-user-generator` があります。これは `/usr/libexec/podman/quadlet` へのシンボリックリンクになっています。
+Quadletに話を戻しましょう。手元のFedora CoreOS 39な環境で、ユーザー用のgeneratorが置かれるディレクトリ `/usr/lib/systemd/user-generators/` を覗いてみると、`/usr/lib/systemd/user-generators/podman-user-generator` というgeneratorがあります。これは `/usr/libexec/podman/quadlet` へのシンボリックリンクになっています。
 
 ```
 core@fedora-39:~$ cat /etc/redhat-release 
@@ -69,7 +70,8 @@ ore@fedora-39:~$ ls -l /usr/lib/systemd/user-generators/podman-user-generator
 lrwxrwxrwx. 5 root root 31 Nov 21 04:19 /usr/lib/systemd/user-generators/podman-user-generator -> ../../../libexec/podman/quadlet
 ```
 
-この `/usr/libexec/podman/quadlet` は実行可能なバイナリで、`podman` パッケージに含まれているのがわかります。
+`/usr/libexec/podman/quadlet` は実行可能なバイナリで、`podman` パッケージに含まれています。
+
 ```
 core@fedora-39:~$ file /usr/libexec/podman/quadlet 
 /usr/libexec/podman/quadlet: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=59f30e7e5606e8c538765862854095113e30a9bb, for GNU/Linux 3.7.0, stripped
@@ -89,20 +91,20 @@ podman-4.7.2-1.fc39.aarch64
 ```
 
 ### Quadlet ファイルの形式
-Quadletがsystemd ユニットファイルを生成するための元ファイル(以下、Quadletファイルと呼んでみます)の形式については、[`podman-systemd.unit` のドキュメント](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)に書いてあります。
+Quadletがユニットファイルを生成するための元ファイル(以下、Quadletファイルと呼んでみます)の形式については、[`podman-systemd.unit(5)`](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)に書いてあります。
 
-まずQuadletファイルの置き場所ですが、root ユーザーとrootlessユーザーで異なります。以下のディレクトリのいずれかにおけばいいようです。
+Quadletファイルの置き場所は、rootユーザーとrootlessユーザーで異なります。以下のディレクトリのいずれかにおけばいいようです。
 
-- root ユーザーの場合: 
+- rootユーザーの場合: 
   - `/usr/share/containers/systemd/`
   - `/etc/containers/systemd/`
-- rootless ユーザーの場合:
+- rootlessユーザーの場合:
   - `$HOME/.config/containers/systemd/`
   - `$XDG_CONFIG_HOME/containers/systemd/`
   - `/etc/containers/systemd/users/$(UID)`
   - `/etc/containers/systemd/users/`
 
-Podmanのコンテナを定義するためには、以下のような内容で `.container` ファイルを作成すればいいようです。systemdユニットファイルっぽい形式ですね。実際、`[Service]` と `[Install]` という項目はユニットファイルと同じように書けるようです。`[Container]` はQuadlet特有ですね。他の例は、上記ドキュメントの[Examples](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#examples)を参照ください。
+例えば、Podmanコンテナを定義するためには、以下のような内容で`.container`という拡張子のファイルを作成すればいいようです。systemdのユニットファイルに似た形式ですね。実際、`[Service]` と `[Install]` という部分はユニットファイルと同じように書けるようです。一方、`[Container]` はQuadlet特有ですね。他の例は[`podman-systemd.unit(5)`のExamples](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#examples)を参照ください。
 
 ```
 [Unit]
@@ -133,14 +135,16 @@ WantedBy=multi-user.target default.target
 ```
 
 
-Quadletでは `[Container]` 以外にも、`[Kube]` や `[Volume]`、`[Network]`、`[Image]` というフィールドが定義できるようですね。特にKubernetesのYAMLファイルを指定できる `[Kube]` は便利そうです。`podman kube play` のおかげですね。ちなみに、KubernetesとPodmanの連携については、[Podmanイン・アクション](https://www.shuwasystem.co.jp/book/9784798070209.html)の「8章 Kubernetesとの連携」でも紹介しています(宣伝)。
+Quadletでは `[Container]` 以外にも、`[Kube]` や `[Volume]`、`[Network]`、`[Image]` というセクションが定義できるようです。特にKubernetesのYAMLファイルを指定できる `[Kube]` は便利そうです。`podman kube play` のおかげですね。ちなみに、KubernetesとPodmanの連携についても、[Podmanイン・アクション](https://www.shuwasystem.co.jp/book/9784798070209.html)の「8章 Kubernetesとの連携」で紹介しています(宣伝)。
 
 
-## 🦭 < Quadlet を使ってみる
+## 🦭 Quadlet を使ってみる
 
-###  `.container` なQuadletファイルの使用
+この章で使うQuadletファイルおよびKubernetes YAMLファイルは、[このブログのGitHubリポジトリ](https://github.com/nishipy/nishipy.github.io/tree/main/content/post/podman-quadlet/manifests)に置いています。
 
-とてもシンプルなQuadletファイルを作成しました。`oneshot` で `podman_hello_world` を実行するだけです。
+###  `.container`なQuadletファイルの使用
+
+とてもシンプルなPodmanコンテナを実行するために、以下のQuadletファイルを作成しました。`oneshot` で [`podman_hello_world`](https://github.com/containers/PodmanHello/blob/main/podman_hello_world.c) を実行するだけです。
 
 ```
 core@fedora-39:~$ cat /var/home/core/.config/containers/systemd/podman-hello.container
@@ -160,7 +164,7 @@ TimeoutStartSec=300
 WantedBy=multi-user.target default.target
 ```
 
-これがどんなsystemdユニットファイルに変換されるかは、`quadlet -dryrun -user` で確認できます。
+このQuadletファイルからどのようなユニットファイルが生成されるかは、`quadlet -dryrun -user` で確認できます。
 
 ```
 core@fedora-39:~$ /usr/libexec/podman/quadlet -dryrun -user
@@ -191,9 +195,9 @@ ExecStart=/usr/bin/podman run --name=systemd-%N --cidfile=%t/%N.cid --replace --
 WantedBy=multi-user.target default.target
 ```
 
-`.container` なQuadletファイルから、systemdユニットファイルを生成するロジックは[この辺](https://github.com/containers/podman/blob/main/pkg/systemd/quadlet/quadlet.go#L398-L402)に実装されています。とても長いですが、Quadletファイルの `[Container]` の下に書かれたパラメータをひたすら変換して、`ExecStart=/usr/bin/podman run` の引数に追加していってるのがわかります。
+`.container` なQuadletファイルからユニットファイルを生成するロジックは[この辺](https://github.com/containers/podman/blob/main/pkg/systemd/quadlet/quadlet.go#L398-L402)に実装されています。とても長いですが、Quadletファイルの `[Container]` の下に書かれたパラメータをひたすら変換して、`ExecStart=/usr/bin/podman run` の引数に追加していってるのがわかるかと思います。
 
-`systemctl --user daemon-reload` すると、Quadletが `podman-hello.service` ファイルを生成してくれました。
+さて、Quadletファイルを書いた後 `systemctl --user daemon-reload` すると、`podman-hello.service` というユニットファイルを生成されます。内容は先程 `quadlet -dryrun -user` で確認したものと同じです。
 
 ```
 core@fedora-39:~$ systemctl --user daemon-reload
@@ -204,7 +208,7 @@ core@fedora-39:~$ file /run/user/$UID/systemd/generator/*/podman-hello.service
 /run/user/501/systemd/generator/multi-user.target.wants/podman-hello.service: symbolic link to ../podman-hello.service
 ```
 
-このsystemdサービスを起動すると、Podmanのロゴの🦭🦭🦭が挨拶だけしてすぐ帰っていくはずです。
+このsystemdサービスを起動すると、🦭が挨拶だけしてすぐ帰っていくはずです。
 
 ```
 core@fedora-39:~$ systemctl --user start podman-hello.service
@@ -230,11 +234,11 @@ Dec 11 19:06:34 fedora-39 podman[22399]: 2023-12-11 19:06:34.23270892 +0900 JST 
 Dec 11 19:06:34 fedora-39 systemd[985]: Finished podman-hello.service - Hello World from Podman.
 ```
 
-### `.kube` なQuadletファイルの使用
+### `.kube`なQuadletファイルの使用
 
-`.kube` という拡張子のQuadletファイルを作成し `[Kube]` ユニットを設定すると、`podman-kube-play` を実行するsystemdサービスユニットファイルが生成されます。
+他のQuadletファイルも試してみましょう。`.kube` という拡張子のQuadletファイルに `[Kube]` セクションを設定すると、[`podman kube play`](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html) を実行するユニットファイルが生成されます。
 
-前章で紹介した通り、`podman-kube-play` では、KubernetesなYAMLファイルからPodmanコンテナやPod、Vol.などを作成することができます。執筆時点で最新のPodman v4.8.0では、以下のKubernetesリソースがサポートされています。
+[`podman kube play`](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html) では、KubernetesなYAMLファイルからPodmanコンテナやPod、Volumeなどを作成することができます。執筆時点で最新のPodman v4.8.0では、以下のKubernetesリソースがサポートされています。
 
 - Pod
 - Deployment
@@ -245,7 +249,7 @@ Dec 11 19:06:34 fedora-39 systemd[985]: Finished podman-hello.service - Hello Wo
 
 ということで、まずはKubernetes YAMLの準備です。今回は `Pod` と `ConfigMap` を使いたいので、Kubernetesのドキュメント [[Configure a Pod to Use a ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)] に載っている例を拝借します。
 
-ConfigMap のマニフェストはこれです。
+ConfigMapのマニフェストはこれで、
 
 ```yaml
 apiVersion: v1
@@ -258,7 +262,7 @@ data:
   special.type: charm
 ```
 
-Pod はこれです。very charmなPodができそうな予感。
+Podはこれです。very charmなPodができそうな予感。
 
 ```yaml
 apiVersion: v1
@@ -276,7 +280,7 @@ spec:
     restartPolicy: Never
 ```
 
-準備ができたところで、Quadletファイルを書いてみます。`[Kube]` のところは、↑のYAMLのパスをそのまま指定すればいいだけでとても楽です。ConfigMapが複数ある場合には、`ConfigMap=`の行をその分だけ足していけばらしいです。
+準備ができたところで、`.kube`なQuadletファイルを書きましょう。`[Kube]`のところは、↑のYAMLのパスをそのまま指定すればいいだけでとても楽です。ConfigMapが複数ある場合には、[`ConfigMap=`](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#configmap)の行を必要な分だけ足していけばいいらしいです。
 
 ```
 [Unit]
@@ -294,9 +298,7 @@ TimeoutStartSec=300
 WantedBy=multi-user.target default.target
 ```
 
-こんなので動くのか不安なので `quadlet -dryrun -user` してみると、ちゃんとsystemdユニットファイル変換されました。`.container` と違って、`ExecStart` には `podman kube play` が指定されています。
-
-TODO: `[Service]` の `Type=notify` を調べる
+こんなので動くのか不安なので `quadlet -dryrun -user` してみると、ちゃんとユニットファイル変換されました。`.container` のときと違って、`ExecStart` には `podman kube play` が指定されています。
 
 ```
 core@fedora-39:~$ /usr/libexec/podman/quadlet -dryrun -user ~/.config/containers/systemd/special-pod.kube
@@ -339,7 +341,7 @@ Dec 12 01:59:06 fedora-39 dapi-test-pod-test-container[327907]: special.how=very
 ```
 
 
-## 🦭 < Quadlet は `podman-generate-systemd` の代替になるのか？
+## 🦭 Quadlet は `podman-generate-systemd` の代替になるのか？
 
 個人的な意見として、`podman-generate-systemd` に慣れ親しんだユーザーは、Quadlet が代替と言われるとモヤると思います。というのも、`podman-generate-systemd` では既存のコンテナやPodからsystemdユニットファイルを生成することができました。一方、Quadlet ファイルは自分で書く必要があり、`podman-generate-systemd` のように既存のコンテナやPodからQuadlet ファイルを自動生成する機能はありません。
 
@@ -354,9 +356,9 @@ Dec 12 01:59:06 fedora-39 dapi-test-pod-test-container[327907]: special.how=very
 
 ちなみに、`podman run` コマンドからQuadletファイルを生成する [`podlet`](https://github.com/k9withabone/podlet) というツールは開発されているようです。
 
-## 🦭 < おわりに
+## 🦭 おわりに
 
-以上で、Podmanとsystemdを連携させるQuadletを完全に理解できました。Podmanユーザーの方はもちろん、Dockerユーザの方も興味あればぜひ触ってみてください。WindowsやMacをお使いでも、[Podman Desktop](https://podman-desktop.io/)で簡単に試せると思います。Quadletで遊びたい場合は、systemdがinitプロセスである必要があるので、[`podman-machine-init`](https://docs.podman.io/en/stable/markdown/podman-machine-init.1.html) して `Fedora CoreOS` のVMを作成した後に、[`podman-machine-ssh`](https://docs.podman.io/en/stable/markdown/podman-machine-ssh.1.html)でログインして試すのが簡単です。
+以上で、Podmanとsystemdを連携させるQuadletを完全に理解できました。Podmanユーザーの方はもちろん、Dockerユーザーの方も興味あればぜひ触ってみてください。WindowsやMacをお使いでも、[Podman Desktop](https://podman-desktop.io/)で簡単に試せると思います。Quadletで遊びたい場合は、systemdがinitプロセスである必要があるので、[`podman machine init`](https://docs.podman.io/en/stable/markdown/podman-machine-init.1.html) して `Fedora CoreOS` のVMを作成した後に、[`podman machine ssh`](https://docs.podman.io/en/stable/markdown/podman-machine-ssh.1.html)して試すのが簡単です。
 
 ```
 [nishipy-MBP] $ podman machine list
@@ -372,13 +374,13 @@ Last login: Fri Dec 11 20:12:59 2023 from 192.168.127.1
 core@fedora-39:~$ 
 ```
 
-## 🦭 < References
+## 🦭 References
 - https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/
 - https://www.redhat.com/sysadmin/quadlet-podman
 - https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
 
 
-## 🦭 < (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい
+## 🦭 (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい
 最近Pythonを書きたくなった時にコントリビュートしている [`containers/ansible-podman-collections`](https://github.com/containers/ansible-podman-collections) でも、Quadletをサポートするモジュールを追加したいな〜と思い、Issueだけ作りました。Maintainerの方も賛同いただいていますが、未着手です... 何かいい案あれば教えてください。
 
 https://github.com/containers/ansible-podman-collections/issues/671
