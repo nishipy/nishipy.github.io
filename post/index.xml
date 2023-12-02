@@ -693,7 +693,6 @@ data-flex-basis="326px"
 &lt;p>cited from: &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview" target="_blank" rel="noopener"
 >https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview&lt;/a>&lt;/p>
 &lt;/blockquote>
-&lt;p>非推奨&lt;/p>
 &lt;h3 id="relisting-in-pleg">Relisting in PLEG&lt;/h3>
 &lt;p>According to the chapter &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#detect-changes-in-container-states-via-relisting" target="_blank" rel="noopener"
 >Detect Changes in Container States Via Relisting&lt;/a>, it is designed to detect container state changes by a process called &amp;ldquo;relisting&amp;rdquo;.&lt;/p>
