@@ -1,13 +1,13 @@
 theme: hugo-theme-stack
 baseURL: https://nishipy.github.io
 languageCode: en-us
-title: nishipy notes
+title: /home/nishipy
 
 languages:
   en:
     languageName: English
     weight: 1
-    title: nishipy notes
+    title: /home/nishipy
 
 menu:
   main:

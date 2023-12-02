@@ -33,6 +33,7 @@ Okay, that sounds very important. There is an embedded link to PLEG's Design Pro
 It seems to be responsible for talking to Container Runtime and the main loop of kubelet, as shown below.
 
 > ![](pleg.png)
+> 
 > cited from: https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview
 
 
@@ -56,6 +57,7 @@ We also need to know the Runtime Pod Cache to look into PLEG.
 The design proposal is [here](https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md).
 
 > ![](runtimepodcache.png)
+> 
 > cited from: https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md#runtime-pod-cache
 
 The diagram is almost the same as the one we saw for PLEG, but a box named "pod cache" is added between PLEG and Pod Workers.
