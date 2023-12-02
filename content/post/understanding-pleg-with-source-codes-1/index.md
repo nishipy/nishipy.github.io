@@ -36,6 +36,7 @@ It seems to be responsible for talking to Container Runtime and the main loop of
 > 
 > cited from: https://github.com/kubernetes/design-proposals-archive/blob/main/node/pod-lifecycle-event-generator.md#overview
 
+非推奨
 
 ### Relisting in PLEG
 
