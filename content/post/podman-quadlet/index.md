@@ -106,7 +106,7 @@ Quadletファイルの置き場所は、rootユーザーとrootlessユーザー�
 
 例えば、Podmanコンテナを定義するためには、以下のような内容で`.container`という拡張子のファイルを作成すればいいようです。systemdのユニットファイルに似た形式ですね。実際、`[Service]` と `[Install]` という部分はユニットファイルと同じように書けるようです。一方、`[Container]` はQuadlet特有ですね。他の例は[`podman-systemd.unit(5)`のExamples](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#examples)を参照ください。
 
-```
+```ini
 [Unit]
 Description=A minimal container
 
@@ -144,10 +144,9 @@ Quadletでは `[Container]` 以外にも、`[Kube]` や `[Volume]`、`[Network]`
 
 ###  `.container`なQuadletファイルの使用
 
-とてもシンプルなPodmanコンテナを実行するために、以下のQuadletファイルを作成しました。`oneshot` で [`podman_hello_world`](https://github.com/containers/PodmanHello/blob/main/podman_hello_world.c) を実行するだけです。
+Podmanコンテナを実行するために、以下のQuadletファイル `podman-hello.container` を作成しました。`oneshot` で [`podman_hello_world`](https://github.com/containers/PodmanHello/blob/main/podman_hello_world.c) を実行するだけです。rootlessユーザーを使うので、`$HOME/.config/containers/systemd/` に置いています。
 
-```
-core@fedora-39:~$ cat /var/home/core/.config/containers/systemd/podman-hello.container
+```ini
 [Unit]
 Description=Hello World from Podman
 
@@ -282,7 +281,7 @@ spec:
 
 準備ができたところで、`.kube`なQuadletファイルを書きましょう。`[Kube]`のところは、↑のYAMLのパスをそのまま指定すればいいだけでとても楽です。ConfigMapが複数ある場合には、[`ConfigMap=`](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#configmap)の行を必要な分だけ足していけばいいらしいです。
 
-```
+```ini
 [Unit]
 Description=A Service of very charm Pod
 
@@ -343,18 +342,18 @@ Dec 12 01:59:06 fedora-39 dapi-test-pod-test-container[327907]: special.how=very
 
 ## 🦭 Quadlet は `podman-generate-systemd` の代替になるのか？
 
-個人的な意見として、`podman-generate-systemd` に慣れ親しんだユーザーは、Quadlet が代替と言われるとモヤると思います。というのも、`podman-generate-systemd` では既存のコンテナやPodからsystemdユニットファイルを生成することができました。一方、Quadlet ファイルは自分で書く必要があり、`podman-generate-systemd` のように既存のコンテナやPodからQuadlet ファイルを自動生成する機能はありません。
+個人的な意見として、`podman-generate-systemd` に慣れ親しんだユーザーは、Quadlet が代替と言われるとモヤると思います。というのも、`podman-generate-systemd` では既存のコンテナやPodからユニットファイルを生成することができました。一方、Quadlet ファイルは自分で書く必要があり、`podman-generate-systemd` のように既存のコンテナやPodからQuadlet ファイルを自動生成する機能はありません。
 
 この辺りは、[containers/podman の Discussion#20218](https://github.com/containers/podman/discussions/20218)の通りコミュニティでも議論されています。`How to replace the "podman generate systemd" command since its deprecated` という質問に対して、PodmanのMaintainerが投稿した以下のコメントがベストアンサーに選ばれています。
 
 > I do not want to add that functionality to Podman as the ultimately goal is to move away from the workflow of generating systemd units based on existing containers. With Quadlet we aim at a Compose and K8s-like declarative workflow. Adding podman generate quadlet conflicts with that goal and it would imply that new Quadlet features had to be added there as well.
 > The current strategy is to deprecate podman generate systemd. That means that no new features will be added to generate systemd but only bug fixes.
 
-このコメントから分かるように、Podmanは最終的には既存のコンテナからsystemdユニットファイルを生成する既存のワークフローから脱却して、KubernetesやComposeのような宣言的なワークフローを目指しており、これがPodmanにQuadletをマージした目的とのこと。このゴールと衝突するため、Quadletなファイルを生成する機能をPodmanに追加する予定はないようです。
+このコメントから分かるように、Podmanは最終的には既存のコンテナからユニットファイルを生成する既存のワークフローから脱却して、KubernetesやComposeのような宣言的なワークフローを目指しており、これがPodmanにQuadletをマージした目的とのこと。このゴールと衝突するため、Quadletなファイルを生成する機能をPodmanに追加する予定はないようです。
 
 確かにQuadletはコンテナやPodだけでなく、NetworkやVolume、Imageも宣言的に書くことができ再配布しやすいですね。Kubernetes YAMLを使ったPodmanコンテナやPodの起動をsystemdと連携できるのも魅力です。
 
-ちなみに、`podman run` コマンドからQuadletファイルを生成する [`podlet`](https://github.com/k9withabone/podlet) というツールは開発されているようです。
+ちなみに、`podman run` コマンドなどからQuadletファイルを生成する [`podlet`](https://github.com/k9withabone/podlet) というツールは開発されているようです。
 
 ## 🦭 おわりに
 
@@ -374,15 +373,15 @@ Last login: Fri Dec 11 20:12:59 2023 from 192.168.127.1
 core@fedora-39:~$ 
 ```
 
-## 🦭 References
-- https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/
-- https://www.redhat.com/sysadmin/quadlet-podman
-- https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+以上です。この記事のタイトルが怒られないことを祈りつつ...🎅
 
-
-## 🦭 (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい
+### 🦭 (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい
 最近Pythonを書きたくなった時にコントリビュートしている [`containers/ansible-podman-collections`](https://github.com/containers/ansible-podman-collections) でも、Quadletをサポートするモジュールを追加したいな〜と思い、Issueだけ作りました。Maintainerの方も賛同いただいていますが、未着手です... 何かいい案あれば教えてください。
 
 https://github.com/containers/ansible-podman-collections/issues/671
 
-以上、この記事のタイトルが怒られないことを祈りつつ...🎅
+
+## 🦭 References
+- https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/
+- https://www.redhat.com/sysadmin/quadlet-podman
+- https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
