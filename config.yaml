@@ -94,7 +94,7 @@ params:
     page:
       - type: toc
   footer:
-    since: 2018
+    since: 2023
     customText:
   # comments:
   #     enabled: true
@@ -103,3 +103,29 @@ params:
 permalinks:
   post: /p/:slug/
   page: /:slug/
+
+related:
+  includeNewer: true
+  threshold: 60
+  toLower: false
+  indices:
+    - name: tags
+      weight: 100
+    - name: categories
+      weight: 200
+
+markup:
+    goldmark:
+        renderer:
+            ## Set to true if you have HTML content inside Markdown
+            unsafe: false
+    tableOfContents:
+        endLevel: 4
+        ordered: true
+        startLevel: 2
+    highlight:
+        noClasses: false
+        codeFences: true
+        lineNoStart: 1
+        lineNos: true
+        lineNumbersInTable: true
