@@ -38,7 +38,7 @@ Podman v4.7.0 で、この [`podman generate systemd](https://docs.podman.io/en/
 
 ### Quadletはsystemdのgenerator
 
-そもそもQuadletとは何なんでしょうか。Quadletの作者であるAlexander Larssonさんのブログ[`Quadlet, an easier way to run system containers`](https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/)には、以下のように書かれています。また、[`podman-systemd.unit` のドキュメント](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)もあわせて参照してださい。
+そもそもQuadletとは何なんでしょうか。Quadletの作者であるAlexander Larssonさんのブログ[`Quadlet, an easier way to run system containers`](https://blogs.gnome.org/alexl/?s=quadlet)には、以下のように書かれています。また、[`podman-systemd.unit` のドキュメント](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)もあわせて参照してださい。
 
 > Quadlet is a systemd generator that takes a container description and automatically generates a systemd service file from it.
 
@@ -246,7 +246,7 @@ Dec 11 19:06:34 fedora-39 systemd[985]: Finished podman-hello.service - Hello Wo
 - Secret
 - DaemonSet
 
-ということで、まずはKubernetes YAMLの準備です。今回は `Pod` と `ConfigMap` を使いたいので、Kubernetesのドキュメント [[Configure a Pod to Use a ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)] に載っている例を拝借します。
+ということで、まずはKubernetes YAMLの準備です。今回は `Pod` と `ConfigMap` を使いたいので、Kubernetesのドキュメント [Configure a Pod to Use a ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/) に載っている例を拝借します。
 
 ConfigMapのマニフェストはこれで、
 
@@ -375,13 +375,18 @@ core@fedora-39:~$
 
 以上です。この記事のタイトルが怒られないことを祈りつつ...🎅
 
-### 🦭 (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい
-最近Pythonを書きたくなった時にコントリビュートしている [`containers/ansible-podman-collections`](https://github.com/containers/ansible-podman-collections) でも、Quadletをサポートするモジュールを追加したいな〜と思い、Issueだけ作りました。Maintainerの方も賛同いただいていますが、未着手です... 何かいい案あれば教えてください。
+### 🦭 (余談)`containers/ansible-podman-collections` でも Quadlet をサポートしたい？
+
+最近Pythonを書きたくなった時にPR送っている Ansible Collection [`containers/ansible-podman-collections`](https://github.com/containers/ansible-podman-collections) でも、Quadletをサポートするモジュール/オプションを追加したいな〜と思い、Issue作って提案してみました。Quadletファイル詳しい人は、`ansible.builtin.template` module使う気もしますが...
 
 https://github.com/containers/ansible-podman-collections/issues/671
 
 
 ## 🦭 References
-- https://blogs.gnome.org/alexl/2021/10/12/quadlet-an-easier-way-to-run-system-containers/
-- https://www.redhat.com/sysadmin/quadlet-podman
-- https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+- [`Quadlet, an easier way to run system containers | Alexander Larsson`](https://blogs.gnome.org/alexl/?s=quadlet)
+- [`Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin`](https://www.redhat.com/sysadmin/quadlet-podman)
+- [`Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin`](https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet)
+- [`How to replace the "podman generate systemd" command since its deprecated #20218 - containers/podman | GitHub`](https://github.com/containers/podman/discussions/20218)
+- [`podman-generate-systemd(1) | Podman Docs`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
+- [`podman-systemd.unit(5) | Podman Docs`](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
+

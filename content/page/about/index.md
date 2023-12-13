@@ -1,7 +1,7 @@
 ---
-title: "Hi there."
+title: "Hi there 👋"
 layout: "about"
 slug: "about"
 ---
 
-Coming soon...
+![](me.jpg)
