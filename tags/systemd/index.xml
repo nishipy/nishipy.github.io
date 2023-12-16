@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>systemd on /home/nishipy</title><link>https://nishipy.github.io/tags/systemd/</link><description>Recent content in systemd on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 17 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/tags/systemd/index.xml" rel="self" type="application/rss+xml"/><item><title>Quadletイン・アクション</title><link>https://nishipy.github.io/p/podman-quadlet/</link><pubDate>Sun, 17 Dec 2023 00:00:00 +0900</pubDate><guid>https://nishipy.github.io/p/podman-quadlet/</guid><description>&lt;img src="https://nishipy.github.io/p/podman-quadlet/seal.jpg" alt="Featured image of post Quadletイン・アクション" />&lt;p>Header Photo by &lt;a class="link" href="https://unsplash.com/@amyannaasher?utm_content=creditCopyText&amp;amp;utm_medium=referral&amp;amp;utm_source=unsplash" target="_blank" rel="noopener"
+>Amy Asher&lt;/a> on &lt;a class="link" href="https://unsplash.com/photos/white-seal-on-soil-giZJHm2m9yY?utm_content=creditCopyText&amp;amp;utm_medium=referral&amp;amp;utm_source=unsplash" target="_blank" rel="noopener"
+>Unsplash&lt;/a>&lt;/p>
+&lt;h2 id="-はじめに">🦭 はじめに&lt;/h2>
+&lt;p>&lt;a class="link" href="https://qiita.com/advent-calendar/2023/redhat" target="_blank" rel="noopener"
+>Red Hat Advent Calendar 2023&lt;/a> 17日目の記事🎅です。
+ちなみにすべて &lt;a class="link" href="https://xn--u9jy52g42am02luma.jp/" target="_blank" rel="noopener"
+>個人の見解&lt;/a> です。&lt;/p>
+&lt;h2 id="-podman-generate-systemd-の非推奨化と-quadlet">🦭 &lt;code>podman-generate-systemd&lt;/code> の非推奨化と Quadlet&lt;/h2>
+&lt;p>エッジ等のユースケースで、systemdのサービスユニットとしてPodmanコンテナやPodを制御したい場合、従来は &lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html" target="_blank" rel="noopener"
+>&lt;code>podman generate systemd&lt;/code>&lt;/a> というコマンドを使って、既存のコンテナやPodからユニットファイルを生成していました。2023年9月に発売された書籍&lt;a class="link" href="https://www.shuwasystem.co.jp/book/9784798070209.html" target="_blank" rel="noopener"
+>Podmanイン・アクション&lt;/a>(&lt;a class="link" href="https://www.manning.com/books/podman-in-action" target="_blank" rel="noopener"
+>Podman in Action&lt;/a>をFedora 38/Podman v4.5.1を前提に日本語訳したもの) の「7章 systemdとの統合」でも、この方法を紹介しています。&lt;/p>
+&lt;p>&lt;img src="https://nishipy.github.io/p/podman-quadlet/podman-in-action-jp.jpeg"
+width="1280"
+height="1280"
+srcset="https://nishipy.github.io/p/podman-quadlet/podman-in-action-jp_huf0e52eaf7cb6a386b59d8a70974dacf5_486848_480x0_resize_q75_box.jpeg 480w, https://nishipy.github.io/p/podman-quadlet/podman-in-action-jp_huf0e52eaf7cb6a386b59d8a70974dacf5_486848_1024x0_resize_q75_box.jpeg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+>&lt;/p>
+&lt;p>Podman v4.7.0 で、この &lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html" target="_blank" rel="noopener"
+>`podman generate systemd&lt;/a> はdeprecated(非推奨)となりました。systemdのもとでPodmanコンテナやPodを実行したい場合は、&lt;a class="link" href="https://github.com/containers/podman/releases/tag/v4.7.0" target="_blank" rel="noopener"
+>Podman v4.7.0 のリリースノート&lt;/a>に記載がある通り、&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
+>Quadlet&lt;/a> を使うことが推奨されています。以下の記載があります。&lt;/p>
+&lt;blockquote>
+&lt;p>The podman generate systemd command is deprecated. Use Quadlet for running containers and pods under systemd.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="-quadletを完全に理解する">🦭 Quadletを完全に理解する&lt;/h2>
+&lt;h3 id="quadletとpodman">QuadletとPodman&lt;/h3>
+&lt;p>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
+>Quadlet&lt;/a>は、PodmanコンテナやPodをsystemdのもとでいい感じに実行できるようにするためのツールであり、もともとPodmanとは別のリポジトリ &lt;a class="link" href="https://github.com/containers/quadlet" target="_blank" rel="noopener"
+>containers/quadlet&lt;/a> で開発されていました。その後Podman v4.4で &lt;a class="link" href="https://github.com/containers/podman/tree/main" target="_blank" rel="noopener"
+>containers/podman&lt;/a> 内の &lt;a class="link" href="https://github.com/containers/podman/tree/main/pkg/systemd/quadlet" target="_blank" rel="noopener"
+>pkg/systemd&lt;/a> の下にマージされています。&lt;a class="link" href="https://github.com/containers/podman/releases/tag/v4.4.0" target="_blank" rel="noopener"
+>Podman v4.4.0 のリリースノート&lt;/a>には以下の記載があります。&lt;/p>
+&lt;blockquote>
+&lt;p>Introduce Quadlet, a new systemd-generator that easily writes and maintains systemd services using Podman.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="quadletはsystemdのgenerator">Quadletはsystemdのgenerator&lt;/h3>
+&lt;p>そもそもQuadletとは何なんでしょうか。Quadletの作者であるAlexander Larssonさんのブログ&lt;a class="link" href="https://blogs.gnome.org/alexl/?s=quadlet" target="_blank" rel="noopener"
+>&lt;code>Quadlet, an easier way to run system containers&lt;/code>&lt;/a>には、以下のように書かれています。また、&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
+>&lt;code>podman-systemd.unit&lt;/code> のドキュメント&lt;/a>もあわせて参照してださい。&lt;/p>
+&lt;blockquote>
+&lt;p>Quadlet is a systemd generator that takes a container description and automatically generates a systemd service file from it.&lt;/p>
+&lt;/blockquote>
+&lt;p>つまるところ、Quadletはsystemdのgeneratorの１つです。generatorについては、&lt;a class="link" href="https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html" target="_blank" rel="noopener"
+>&lt;code>systemd.generator(7)&lt;/code>&lt;/a>のman pageに詳しく説明されています。ChatGPTくんに頼んで要約してもらいましょう。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>(ChatGPTくん🤖):&lt;/strong> ジェネレータは、systemdの一部で、システムの起動時や設定再読み込み時に実行され、ユニットファイルがロードされる前に動的にユニットファイルやシンボリックリンクを生成する役割を持つ。ジェネレータは、特定のディレクトリに配置され、システム設定を拡張・上書きし、ユニットファイルの階層を拡張する。優先度の違うディレクトリに出力し、systemctl daemon-reloadで前の設定を消去し、ジェネレータを再実行してsystemdがユニットを再読み込む。&lt;/p>
+&lt;/blockquote>
+&lt;p>わかった気になれたところで、&lt;a class="link" href="https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html#Examples" target="_blank" rel="noopener"
+>man pageのExamples&lt;/a>を見てみましょう。ここでは最も馴染み深いであろう &lt;code>Example 1. systemd-fstab-generator&lt;/code> を取り上げます。Quadletと同じくgeneratorの1つである &lt;a class="link" href="https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html#" target="_blank" rel="noopener"
+>&lt;code>systemd-fstab-generator&lt;/code>&lt;/a> が、&lt;code>/etc/fstab&lt;/code> の内容をもとにユニットファイルを生成してくれています。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Example 1. systemd-fstab-generator&lt;/strong>&lt;/p>
+&lt;p>systemd-fstab-generator(8) converts /etc/fstab into native mount units. It uses argv[1] as location to place the generated unit files in order to allow the user to override /etc/fstab with their own native unit files, but also to ensure that /etc/fstab overrides any vendor default from /usr/.&lt;/p>
+&lt;p>After editing /etc/fstab, the user should invoke systemctl daemon-reload. This will re-run all generators and cause systemd to reload units from disk. To actually mount new directories added to fstab, systemctl start /path/to/mountpoint or systemctl start local-fs.target may be used.&lt;/p>
+&lt;/blockquote>
+&lt;p>Quadletに話を戻しましょう。手元のFedora CoreOS 39な環境で、ユーザー用のgeneratorが置かれるディレクトリ &lt;code>/usr/lib/systemd/user-generators/&lt;/code> を覗いてみると、&lt;code>/usr/lib/systemd/user-generators/podman-user-generator&lt;/code> というgeneratorがあります。これは &lt;code>/usr/libexec/podman/quadlet&lt;/code> へのシンボリックリンクになっています。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ cat /etc/redhat-release
+Fedora release 39 (Thirty Nine)
+core@fedora-39:~$ podman version
+Client: Podman Engine
+Version: 4.7.2
+API Version: 4.7.2
+Go Version: go1.21.1
+Built: Tue Oct 31 23:30:33 2023
+OS/Arch: linux/arm64
+ore@fedora-39:~$ ls -l /usr/lib/systemd/user-generators/podman-user-generator
+lrwxrwxrwx. 5 root root 31 Nov 21 04:19 /usr/lib/systemd/user-generators/podman-user-generator -&amp;gt; ../../../libexec/podman/quadlet
+&lt;/code>&lt;/pre>&lt;p>&lt;code>/usr/libexec/podman/quadlet&lt;/code> は実行可能なバイナリで、&lt;code>podman&lt;/code> パッケージに含まれています。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ file /usr/libexec/podman/quadlet
+/usr/libexec/podman/quadlet: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=59f30e7e5606e8c538765862854095113e30a9bb, for GNU/Linux 3.7.0, stripped
+core@fedora-39:~$ /usr/libexec/podman/quadlet -h
+Usage of /usr/libexec/podman/quadlet:
+-dryrun
+Run in dryrun mode printing debug information
+-no-kmsg-log
+Don&amp;#39;t log to kmsg
+-user
+Run as systemd user
+-v Print debug information
+-version
+Print version information and exit
+core@fedora-39:~$ rpm -qf /usr/libexec/podman/quadlet
+podman-4.7.2-1.fc39.aarch64
+&lt;/code>&lt;/pre>&lt;h3 id="quadlet-ファイルの形式">Quadlet ファイルの形式&lt;/h3>
+&lt;p>Quadletがユニットファイルを生成するための元ファイル(以下、Quadletファイルと呼んでみます)の形式については、&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
+>&lt;code>podman-systemd.unit(5)&lt;/code>&lt;/a>に書いてあります。&lt;/p>
+&lt;p>Quadletファイルの置き場所は、rootユーザーとrootlessユーザーで異なります。以下のディレクトリのいずれかにおけばいいようです。&lt;/p>
+&lt;ul>
+&lt;li>rootユーザーの場合:
+&lt;ul>
+&lt;li>&lt;code>/usr/share/containers/systemd/&lt;/code>&lt;/li>
+&lt;li>&lt;code>/etc/containers/systemd/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>rootlessユーザーの場合:
+&lt;ul>
+&lt;li>&lt;code>$HOME/.config/containers/systemd/&lt;/code>&lt;/li>
+&lt;li>&lt;code>$XDG_CONFIG_HOME/containers/systemd/&lt;/code>&lt;/li>
+&lt;li>&lt;code>/etc/containers/systemd/users/$(UID)&lt;/code>&lt;/li>
+&lt;li>&lt;code>/etc/containers/systemd/users/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>例えば、Podmanコンテナを定義するためには、以下のような内容で&lt;code>.container&lt;/code>という拡張子のファイルを作成すればいいようです。systemdのユニットファイルに似た形式ですね。実際、&lt;code>[Service]&lt;/code> と &lt;code>[Install]&lt;/code> という部分はユニットファイルと同じように書けるようです。一方、&lt;code>[Container]&lt;/code> はQuadlet特有ですね。他の例は&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#examples" target="_blank" rel="noopener"
+>&lt;code>podman-systemd.unit(5)&lt;/code>のExamples&lt;/a>を参照ください。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">A minimal container&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Container]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Use the centos image&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Image&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">quay.io/centos/centos:latest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Use volume and network defined below&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Volume&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">test.volume:/data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Network&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">test.network&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># In the container we just run sleep&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Exec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">sleep 60&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Restart service when sleep finishes&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">always&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Extend Timeout to allow time to pull the image&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">TimeoutStartSec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">900&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ExecStartPre flag and other systemd commands can go here, see systemd.unit(5) man page.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ExecStartPre&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">/usr/share/mincontainer/setup.sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Install]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Start by default on boot&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">WantedBy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">multi-user.target default.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Quadletでは &lt;code>[Container]&lt;/code> 以外にも、&lt;code>[Kube]&lt;/code> や &lt;code>[Volume]&lt;/code>、&lt;code>[Network]&lt;/code>、&lt;code>[Image]&lt;/code> というセクションが定義できるようです。特にKubernetesのYAMLファイルを指定できる &lt;code>[Kube]&lt;/code> は便利そうです。&lt;code>podman kube play&lt;/code> のおかげですね。ちなみに、KubernetesとPodmanの連携についても、&lt;a class="link" href="https://www.shuwasystem.co.jp/book/9784798070209.html" target="_blank" rel="noopener"
+>Podmanイン・アクション&lt;/a>の「8章 Kubernetesとの連携」で紹介しています(宣伝)。&lt;/p>
+&lt;h2 id="-quadlet-を使ってみる">🦭 Quadlet を使ってみる&lt;/h2>
+&lt;p>この章で使うQuadletファイルおよびKubernetes YAMLファイルは、&lt;a class="link" href="https://github.com/nishipy/nishipy.github.io/tree/main/content/post/podman-quadlet/manifests" target="_blank" rel="noopener"
+>このブログのGitHubリポジトリ&lt;/a>に置いています。&lt;/p>
+&lt;h3 id="containerなquadletファイルの使用">&lt;code>.container&lt;/code>なQuadletファイルの使用&lt;/h3>
+&lt;p>Podmanコンテナを実行するために、以下のQuadletファイル &lt;code>podman-hello.container&lt;/code> を作成しました。&lt;code>oneshot&lt;/code> で &lt;a class="link" href="https://github.com/containers/PodmanHello/blob/main/podman_hello_world.c" target="_blank" rel="noopener"
+>&lt;code>podman_hello_world&lt;/code>&lt;/a> を実行するだけです。rootlessユーザーを使うので、&lt;code>$HOME/.config/containers/systemd/&lt;/code> に置いています。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">Hello World from Podman&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Container]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Image&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">quay.io/podman/hello:latest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Exec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">/usr/local/bin/podman_hello_world&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">no&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">oneshot&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">TimeoutStartSec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">300&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Install]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">WantedBy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">multi-user.target default.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>このQuadletファイルからどのようなユニットファイルが生成されるかは、&lt;code>quadlet -dryrun -user&lt;/code> で確認できます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ /usr/libexec/podman/quadlet -dryrun -user
+quadlet-generator[21202]: Loading source unit file /var/home/core/.config/containers/systemd/podman-hello.container
+---podman-hello.service---
+[Unit]
+Description=Hello World from Podman
+SourcePath=/var/home/core/.config/containers/systemd/podman-hello.container
+RequiresMountsFor=%t/containers
+[X-Container]
+Image=quay.io/podman/hello:latest
+Exec=/usr/local/bin/podman_hello_world
+[Service]
+Restart=no
+Type=oneshot
+TimeoutStartSec=300
+Environment=PODMAN_SYSTEMD_UNIT=%n
+KillMode=mixed
+ExecStop=/usr/bin/podman rm -f -i --cidfile=%t/%N.cid
+ExecStopPost=-/usr/bin/podman rm -f -i --cidfile=%t/%N.cid
+Delegate=yes
+SyslogIdentifier=%N
+ExecStart=/usr/bin/podman run --name=systemd-%N --cidfile=%t/%N.cid --replace --rm --cgroups=split quay.io/podman/hello:latest /usr/local/bin/podman_hello_world
+[Install]
+WantedBy=multi-user.target default.target
+&lt;/code>&lt;/pre>&lt;p>&lt;code>.container&lt;/code> なQuadletファイルからユニットファイルを生成するロジックは&lt;a class="link" href="https://github.com/containers/podman/blob/main/pkg/systemd/quadlet/quadlet.go#L398-L402" target="_blank" rel="noopener"
+>この辺&lt;/a>に実装されています。とても長いですが、Quadletファイルの &lt;code>[Container]&lt;/code> の下に書かれたパラメータをひたすら変換して、&lt;code>ExecStart=/usr/bin/podman run&lt;/code> の引数に追加していってるのがわかるかと思います。&lt;/p>
+&lt;p>さて、Quadletファイルを書いた後 &lt;code>systemctl --user daemon-reload&lt;/code> すると、&lt;code>podman-hello.service&lt;/code> というユニットファイルを生成されます。内容は先程 &lt;code>quadlet -dryrun -user&lt;/code> で確認したものと同じです。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ systemctl --user daemon-reload
+core@fedora-39:~$ file /run/user/$UID/systemd/generator/podman-hello.service
+/run/user/501/systemd/generator/podman-hello.service: ASCII text
+core@fedora-39:~$ file /run/user/$UID/systemd/generator/*/podman-hello.service
+/run/user/501/systemd/generator/default.target.wants/podman-hello.service: symbolic link to ../podman-hello.service
+/run/user/501/systemd/generator/multi-user.target.wants/podman-hello.service: symbolic link to ../podman-hello.service
+&lt;/code>&lt;/pre>&lt;p>このsystemdサービスを起動すると、🦭が挨拶だけしてすぐ帰っていくはずです。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ systemctl --user start podman-hello.service
+core@fedora-39:~$ journalctl --user -u podman-hello.service
+Dec 11 19:06:34 fedora-39 podman[22326]: 2023-12-11 19:06:34.164871911 +0900 JST m=+0.116574772 container start 3c1197296f89b6f70afb20a6ac01fa53f41f7bca1875578bffb965749984ffac (image=quay.io/podman/hello:latest, name=syst&amp;gt;
+Dec 11 19:06:34 fedora-39 podman[22326]: 2023-12-11 19:06:34.165512076 +0900 JST m=+0.117214937 container attach 3c1197296f89b6f70afb20a6ac01fa53f41f7bca1875578bffb965749984ffac (image=quay.io/podman/hello:latest, name=sys&amp;gt;
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: !... Hello Podman World ...!
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: .--&amp;#34;--.
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: / - - \
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: / (O) (O) \
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: ~~~| -=(,Y,)=- |
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: .---. /` \ |~~
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: ~/ o o \~~~~.----. ~~
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: | =(X)= |~ / (O (O) \
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: ~~~~~~~ ~| =(Y_)=- |
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: ~~~~ ~~~| U |~~
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: Project: https://github.com/containers/podman
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: Website: https://podman.io
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: Documents: https://docs.podman.io
+Dec 11 19:06:34 fedora-39 podman-hello[22326]: Twitter: @Podman_io
+Dec 11 19:06:34 fedora-39 podman[22326]: 2023-12-11 19:06:34.1658957 +0900 JST m=+0.117598561 container died 3c1197296f89b6f70afb20a6ac01fa53f41f7bca1875578bffb965749984ffac (image=quay.io/podman/hello:latest, name=systemd&amp;gt;
+Dec 11 19:06:34 fedora-39 podman[22399]: 2023-12-11 19:06:34.23270892 +0900 JST m=+0.060999942 container remove 3c1197296f89b6f70afb20a6ac01fa53f41f7bca1875578bffb965749984ffac (image=quay.io/podman/hello:latest, name=syst&amp;gt;
+Dec 11 19:06:34 fedora-39 systemd[985]: Finished podman-hello.service - Hello World from Podman.
+&lt;/code>&lt;/pre>&lt;h3 id="kubeなquadletファイルの使用">&lt;code>.kube&lt;/code>なQuadletファイルの使用&lt;/h3>
+&lt;p>他のQuadletファイルも試してみましょう。&lt;code>.kube&lt;/code> という拡張子のQuadletファイルに &lt;code>[Kube]&lt;/code> セクションを設定すると、&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html" target="_blank" rel="noopener"
+>&lt;code>podman kube play&lt;/code>&lt;/a> を実行するユニットファイルが生成されます。&lt;/p>
+&lt;p>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html" target="_blank" rel="noopener"
+>&lt;code>podman kube play&lt;/code>&lt;/a> では、KubernetesなYAMLファイルからPodmanコンテナやPod、Volumeなどを作成することができます。執筆時点で最新のPodman v4.8.0では、以下のKubernetesリソースがサポートされています。&lt;/p>
+&lt;ul>
+&lt;li>Pod&lt;/li>
+&lt;li>Deployment&lt;/li>
+&lt;li>PersistentVolumeClaim&lt;/li>
+&lt;li>ConfigMap&lt;/li>
+&lt;li>Secret&lt;/li>
+&lt;li>DaemonSet&lt;/li>
+&lt;/ul>
+&lt;p>ということで、まずはKubernetes YAMLの準備です。今回は &lt;code>Pod&lt;/code> と &lt;code>ConfigMap&lt;/code> を使いたいので、Kubernetesのドキュメント &lt;a class="link" href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/" target="_blank" rel="noopener"
+>Configure a Pod to Use a ConfigMap&lt;/a> に載っている例を拝借します。&lt;/p>
+&lt;p>ConfigMapのマニフェストはこれで、&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ConfigMap&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">special-config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">namespace&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">special.how&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">very&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">special.type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">charm&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Podはこれです。very charmなPodができそうな予感。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Pod&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">dapi-test-pod&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">containers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">test-container&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">registry.k8s.io/busybox&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;/bin/sh&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;-c&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;env&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">envFrom&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">configMapRef&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">special-config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restartPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Never&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>準備ができたところで、&lt;code>.kube&lt;/code>なQuadletファイルを書きましょう。&lt;code>[Kube]&lt;/code>のところは、↑のYAMLのパスをそのまま指定すればいいだけでとても楽です。ConfigMapが複数ある場合には、&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#configmap" target="_blank" rel="noopener"
+>&lt;code>ConfigMap=&lt;/code>&lt;/a>の行を必要な分だけ足していけばいいらしいです。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Unit]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">A Service of very charm Pod&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Kube]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Yaml&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">/tmp/quadlet-in-action/pod-configmap-envFrom.yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ConfigMap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">/tmp/quadlet-in-action/special-config.yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Service]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">Restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">no&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">TimeoutStartSec&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">300&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[Install]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">WantedBy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">multi-user.target default.target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>こんなので動くのか不安なので &lt;code>quadlet -dryrun -user&lt;/code> してみると、ちゃんとユニットファイル変換されました。&lt;code>.container&lt;/code> のときと違って、&lt;code>ExecStart&lt;/code> には &lt;code>podman kube play&lt;/code> が指定されています。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ /usr/libexec/podman/quadlet -dryrun -user ~/.config/containers/systemd/special-pod.kube
+...snip...
+quadlet-generator[42819]: Loading source unit file /var/home/core/.config/containers/systemd/special-pod.kube
+...snip...
+---special-pod.service---
+[Unit]
+Description=A Service of very charm Pod
+SourcePath=/var/home/core/.config/containers/systemd/special-pod.kube
+RequiresMountsFor=%t/containers
+[X-Kube]
+Yaml=/tmp/quadlet-in-action/pod-configmap-envFrom.yaml
+ConfigMap=/tmp/quadlet-in-action/special-config.yaml
+[Service]
+Restart=no
+Type=notify
+TimeoutStartSec=300
+KillMode=mixed
+Environment=PODMAN_SYSTEMD_UNIT=%n
+NotifyAccess=all
+SyslogIdentifier=%N
+ExecStart=/usr/bin/podman kube play --replace --service-container=true --configmap /tmp/quadlet-in-action/special-config.yaml /tmp/quadlet-in-action/pod-configmap-envFrom.yaml
+ExecStopPost=/usr/bin/podman kube down /tmp/quadlet-in-action/pod-configmap-envFrom.yaml
+[Install]
+WantedBy=multi-user.target default.target
+&lt;/code>&lt;/pre>&lt;p>忘れずに &lt;code>systemctl --user daemon-reload&lt;/code> した後、&lt;code>special-pod.service&lt;/code> を起動してみましょう。very charmなコンテナがsystemdサービスとして実行されたことがわかります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>core@fedora-39:~$ systemctl --user daemon-reload
+core@fedora-39:~$ systemctl --user start special-pod.service
+core@fedora-39:~$ journalctl --user -u special-pod.service --grep &amp;#34;special\.&amp;#34;
+Dec 12 01:59:06 fedora-39 dapi-test-pod-test-container[327907]: special.type=charm
+Dec 12 01:59:06 fedora-39 dapi-test-pod-test-container[327907]: special.how=very
+&lt;/code>&lt;/pre>&lt;h2 id="-quadlet-は-podman-generate-systemd-の代替になるのか">🦭 Quadlet は &lt;code>podman-generate-systemd&lt;/code> の代替になるのか？&lt;/h2>
+&lt;p>個人的な意見として、&lt;code>podman-generate-systemd&lt;/code> に慣れ親しんだユーザーは、Quadlet が代替と言われるとモヤると思います。というのも、&lt;code>podman-generate-systemd&lt;/code> では既存のコンテナやPodからユニットファイルを生成することができました。一方、Quadlet ファイルは自分で書く必要があり、&lt;code>podman-generate-systemd&lt;/code> のように既存のコンテナやPodからQuadlet ファイルを自動生成する機能はありません。&lt;/p>
+&lt;p>この辺りは、&lt;a class="link" href="https://github.com/containers/podman/discussions/20218" target="_blank" rel="noopener"
+>containers/podman の Discussion#20218&lt;/a>の通りコミュニティでも議論されています。&lt;code>How to replace the &amp;quot;podman generate systemd&amp;quot; command since its deprecated&lt;/code> という質問に対して、PodmanのMaintainerが投稿した以下のコメントがベストアンサーに選ばれています。&lt;/p>
+&lt;blockquote>
+&lt;p>I do not want to add that functionality to Podman as the ultimately goal is to move away from the workflow of generating systemd units based on existing containers. With Quadlet we aim at a Compose and K8s-like declarative workflow. Adding podman generate quadlet conflicts with that goal and it would imply that new Quadlet features had to be added there as well.
+The current strategy is to deprecate podman generate systemd. That means that no new features will be added to generate systemd but only bug fixes.&lt;/p>
+&lt;/blockquote>
+&lt;p>このコメントから分かるように、Podmanは最終的には既存のコンテナからユニットファイルを生成する既存のワークフローから脱却して、KubernetesやComposeのような宣言的なワークフローを目指しており、これがPodmanにQuadletをマージした目的とのこと。このゴールと衝突するため、Quadletなファイルを生成する機能をPodmanに追加する予定はないようです。&lt;/p>
+&lt;p>確かにQuadletはコンテナやPodだけでなく、NetworkやVolume、Imageも宣言的に書くことができ再配布しやすいですね。Kubernetes YAMLを使ったPodmanコンテナやPodの起動をsystemdと連携できるのも魅力です。&lt;/p>
+&lt;p>ちなみに、&lt;code>podman run&lt;/code> コマンドなどからQuadletファイルを生成する &lt;a class="link" href="https://github.com/k9withabone/podlet" target="_blank" rel="noopener"
+>&lt;code>podlet&lt;/code>&lt;/a> というツールは開発されているようです。&lt;/p>
+&lt;h2 id="-おわりに">🦭 おわりに&lt;/h2>
+&lt;p>以上で、Podmanとsystemdを連携させるQuadletを完全に理解できました。Podmanユーザーの方はもちろん、Dockerユーザーの方も興味あればぜひ触ってみてください。WindowsやMacをお使いでも、&lt;a class="link" href="https://podman-desktop.io/" target="_blank" rel="noopener"
+>Podman Desktop&lt;/a>で簡単に試せると思います。Quadletで遊びたい場合は、systemdがinitプロセスである必要があるので、&lt;a class="link" href="https://docs.podman.io/en/stable/markdown/podman-machine-init.1.html" target="_blank" rel="noopener"
+>&lt;code>podman machine init&lt;/code>&lt;/a> して &lt;code>Fedora CoreOS&lt;/code> のVMを作成した後に、&lt;a class="link" href="https://docs.podman.io/en/stable/markdown/podman-machine-ssh.1.html" target="_blank" rel="noopener"
+>&lt;code>podman machine ssh&lt;/code>&lt;/a>して試すのが簡単です。&lt;/p>
+&lt;pre tabindex="0">&lt;code>[nishipy-MBP] $ podman machine list
+NAME VM TYPE CREATED LAST UP CPUS MEMORY DISK SIZE
+fedoracos* qemu 4 days ago Currently running 1 2GiB 100GiB
+[nishipy-MBP] $ podman machine ssh fedoracos
+Connecting to vm fedoracos. To close connection, use `~.` or `exit`
+Fedora CoreOS 39.20231119.2.0
+Tracker: https://github.com/coreos/fedora-coreos-tracker
+Discuss: https://discussion.fedoraproject.org/tag/coreos
+Last login: Fri Dec 11 20:12:59 2023 from 192.168.127.1
+core@fedora-39:~$
+&lt;/code>&lt;/pre>&lt;p>以上です。この記事のタイトルが怒られないことを祈りつつ&amp;hellip;🎅&lt;/p>
+&lt;h3 id="-余談containersansible-podman-collections-でも-quadlet-をサポートしたい">🦭 (余談)&lt;code>containers/ansible-podman-collections&lt;/code> でも Quadlet をサポートしたい？&lt;/h3>
+&lt;p>最近Pythonを書きたくなった時にPR送っている Ansible Collection &lt;a class="link" href="https://github.com/containers/ansible-podman-collections" target="_blank" rel="noopener"
+>&lt;code>containers/ansible-podman-collections&lt;/code>&lt;/a> でも、Quadletをサポートするモジュール/オプションを追加したいな〜と思い、Issue作って提案してみました。Quadletファイル詳しい人は、&lt;code>ansible.builtin.template&lt;/code> module使う気もしますが&amp;hellip;&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/containers/ansible-podman-collections/issues/671" target="_blank" rel="noopener"
+>https://github.com/containers/ansible-podman-collections/issues/671&lt;/a>&lt;/p>
+&lt;h2 id="-references">🦭 References&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://blogs.gnome.org/alexl/?s=quadlet" target="_blank" rel="noopener"
+>&lt;code>Quadlet, an easier way to run system containers | Alexander Larsson&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.redhat.com/sysadmin/quadlet-podman" target="_blank" rel="noopener"
+>&lt;code>Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet" target="_blank" rel="noopener"
+>&lt;code>Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/containers/podman/discussions/20218" target="_blank" rel="noopener"
+>&lt;code>How to replace the &amp;quot;podman generate systemd&amp;quot; command since its deprecated #20218 - containers/podman | GitHub&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html" target="_blank" rel="noopener"
+>&lt;code>podman-generate-systemd(1) | Podman Docs&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
+>&lt;code>podman-systemd.unit(5) | Podman Docs&lt;/code>&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
