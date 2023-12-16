@@ -19,7 +19,7 @@ Header Photo by [Amy Asher](https://unsplash.com/@amyannaasher?utm_content=credi
 [Red Hat Advent Calendar 2023](https://qiita.com/advent-calendar/2023/redhat) 17日目の記事🎅です。
 ちなみにすべて [個人の見解](https://xn--u9jy52g42am02luma.jp/) です。
 
-## 🦭 `podman-generate-systemd` の非推奨化と Quadlet
+## 🦭 `podman generate systemd` の非推奨化と Quadlet
 
 エッジ等のユースケースで、systemdのサービスユニットとしてPodmanコンテナやPodを制御したい場合、従来は [`podman generate systemd`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html) というコマンドを使って、既存のコンテナやPodからユニットファイルを生成していました。2023年9月に発売された書籍[Podmanイン・アクション](https://www.shuwasystem.co.jp/book/9784798070209.html)([Podman in Action](https://www.manning.com/books/podman-in-action)をFedora 38/Podman v4.5.1を前提に日本語訳したもの) の「7章 systemdとの統合」でも、この方法を紹介しています。
 
@@ -383,10 +383,10 @@ https://github.com/containers/ansible-podman-collections/issues/671
 
 
 ## 🦭 References
-- [`Quadlet, an easier way to run system containers | Alexander Larsson`](https://blogs.gnome.org/alexl/?s=quadlet)
-- [`Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin`](https://www.redhat.com/sysadmin/quadlet-podman)
-- [`Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin`](https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet)
-- [`How to replace the "podman generate systemd" command since its deprecated #20218 - containers/podman | GitHub`](https://github.com/containers/podman/discussions/20218)
-- [`podman-generate-systemd(1) | Podman Docs`](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
-- [`podman-systemd.unit(5) | Podman Docs`](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
+- [Quadlet, an easier way to run system containers | Alexander Larsson](https://blogs.gnome.org/alexl/?s=quadlet)
+- [Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin](https://www.redhat.com/sysadmin/quadlet-podman)
+- [Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin](https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet)
+- [How to replace the "podman generate systemd" command since its deprecated #20218 - containers/podman | GitHub](https://github.com/containers/podman/discussions/20218)
+- [podman-generate-systemd(1) | Podman Docs](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
+- [podman-systemd.unit(5) | Podman Docs](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
 
