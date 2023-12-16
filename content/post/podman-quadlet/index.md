@@ -29,7 +29,7 @@ Podman v4.7.0 で、この [`podman generate systemd](https://docs.podman.io/en/
 
 > The podman generate systemd command is deprecated. Use Quadlet for running containers and pods under systemd.
 
-## 🦭 Quadlet を完全に理解する
+## 🦭 Quadletを完全に理解する
 
 ### QuadletとPodman
 
