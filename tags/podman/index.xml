@@ -6,7 +6,7 @@
 >Red Hat Advent Calendar 2023&lt;/a> 17日目の記事🎅です。
 ちなみにすべて &lt;a class="link" href="https://xn--u9jy52g42am02luma.jp/" target="_blank" rel="noopener"
 >個人の見解&lt;/a> です。&lt;/p>
-&lt;h2 id="-podman-generate-systemd-の非推奨化と-quadlet">🦭 &lt;code>podman-generate-systemd&lt;/code> の非推奨化と Quadlet&lt;/h2>
+&lt;h2 id="-podman-generate-systemd-の非推奨化と-quadlet">🦭 &lt;code>podman generate systemd&lt;/code> の非推奨化と Quadlet&lt;/h2>
 &lt;p>エッジ等のユースケースで、systemdのサービスユニットとしてPodmanコンテナやPodを制御したい場合、従来は &lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html" target="_blank" rel="noopener"
 >&lt;code>podman generate systemd&lt;/code>&lt;/a> というコマンドを使って、既存のコンテナやPodからユニットファイルを生成していました。2023年9月に発売された書籍&lt;a class="link" href="https://www.shuwasystem.co.jp/book/9784798070209.html" target="_blank" rel="noopener"
 >Podmanイン・アクション&lt;/a>(&lt;a class="link" href="https://www.manning.com/books/podman-in-action" target="_blank" rel="noopener"
@@ -433,15 +433,15 @@ core@fedora-39:~$
 &lt;h2 id="-references">🦭 References&lt;/h2>
 &lt;ul>
 &lt;li>&lt;a class="link" href="https://blogs.gnome.org/alexl/?s=quadlet" target="_blank" rel="noopener"
->&lt;code>Quadlet, an easier way to run system containers | Alexander Larsson&lt;/code>&lt;/a>&lt;/li>
+>Quadlet, an easier way to run system containers | Alexander Larsson&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://www.redhat.com/sysadmin/quadlet-podman" target="_blank" rel="noopener"
->&lt;code>Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin&lt;/code>&lt;/a>&lt;/li>
+>Make systemd better for Podman with Quadlet | Red Hat - Enable Sysadmin&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet" target="_blank" rel="noopener"
->&lt;code>Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin&lt;/code>&lt;/a>&lt;/li>
+>Deploying a multi-container application using Podman and Quadlet | Red Hat - Enable Sysadmin&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://github.com/containers/podman/discussions/20218" target="_blank" rel="noopener"
->&lt;code>How to replace the &amp;quot;podman generate systemd&amp;quot; command since its deprecated #20218 - containers/podman | GitHub&lt;/code>&lt;/a>&lt;/li>
+>How to replace the &amp;ldquo;podman generate systemd&amp;rdquo; command since its deprecated #20218 - containers/podman | GitHub&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html" target="_blank" rel="noopener"
->&lt;code>podman-generate-systemd(1) | Podman Docs&lt;/code>&lt;/a>&lt;/li>
+>podman-generate-systemd(1) | Podman Docs&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html" target="_blank" rel="noopener"
->&lt;code>podman-systemd.unit(5) | Podman Docs&lt;/code>&lt;/a>&lt;/li>
+>podman-systemd.unit(5) | Podman Docs&lt;/a>&lt;/li>
 &lt;/ul></description></item></channel></rss>
