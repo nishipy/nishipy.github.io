@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>kubernetes on /home/nishipy</title><link>https://nishipy.github.io/categories/kubernetes/</link><description>Recent content in kubernetes on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 24 Mar 2023 09:32:47 +0900</lastBuildDate><atom:link href="https://nishipy.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code - Part 2</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</link><pubDate>Fri, 24 Mar 2023 09:32:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-2/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 2" />&lt;p>For the goal of this series or abstract of the PLEG and so on, please refer to the previous post &lt;a class="link" href="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/" >Understanding PLEG with source code - Part 1&lt;/a>.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>kubernetes on /home/nishipy</title><link>https://blog.nishipy.com/categories/kubernetes/</link><description>Recent content in kubernetes on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 24 Mar 2023 09:32:47 +0900</lastBuildDate><atom:link href="https://blog.nishipy.com/categories/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Understanding PLEG with source code - Part 2</title><link>https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-2/</link><pubDate>Fri, 24 Mar 2023 09:32:47 +0900</pubDate><guid>https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-2/</guid><description>&lt;img src="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-2/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 2" />&lt;p>For the goal of this series or abstract of the PLEG and so on, please refer to the previous post &lt;a class="link" href="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/" >Understanding PLEG with source code - Part 1&lt;/a>.
 Now, let&amp;rsquo;s read the source code of PLEG! Note that the source code in the following part comes from &lt;a class="link" href="https://github.com/kubernetes/kubernetes/tree/release-1.25" target="_blank" rel="noopener"
 >&lt;code>Kubernetes 1.25&lt;/code>&lt;/a>.&lt;/p>
 &lt;h2 id="pkgkubeletplegpleggo">pkg/kubelet/pleg/pleg.go&lt;/h2>
@@ -83,7 +83,7 @@ We have some events like &lt;code>ContainerStarted&lt;/code>, &lt;code>Container
 &lt;/div>&lt;h2 id="pkgkubeletpleggenericgo">pkg/kubelet/pleg/generic.go&lt;/h2>
 &lt;p>The PLEG-related source code is mainly written in this file.
 The GenericPLEG structure looks as follows.
-As for the Cache, please refer to the &lt;code>Runtime Pod Cache&lt;/code> described in the &lt;a class="link" href="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/" >previous article&lt;/a>.
+As for the Cache, please refer to the &lt;code>Runtime Pod Cache&lt;/code> described in the &lt;a class="link" href="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/" >previous article&lt;/a>.
 Looking at the comments in &lt;code>kubecontainer.Cache interface&lt;/code>, Cache seems to store the &lt;code>PodStatus&lt;/code> of all containers/pods visible to the container runtime.&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
@@ -1382,7 +1382,7 @@ Yeah, now we can see where &lt;code>PLEG is not healthy: pleg was last seen acti
 >kubernetes/pkg/kubelet/pleg at release-1.25 - GitHub&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://github.com/kubernetes/enhancements/issues/3386" target="_blank" rel="noopener"
 >Isuue: Kubelet Evented PLEG for Better Performance - GitHub&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Understanding PLEG with source code - Part 1</title><link>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/</link><pubDate>Sat, 28 Jan 2023 13:50:47 +0900</pubDate><guid>https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/</guid><description>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 1" />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1958" target="_blank" rel="noopener"
+&lt;/ul></description></item><item><title>Understanding PLEG with source code - Part 1</title><link>https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/</link><pubDate>Sat, 28 Jan 2023 13:50:47 +0900</pubDate><guid>https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/</guid><description>&lt;img src="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/pleg.png" alt="Featured image of post Understanding PLEG with source code - Part 1" />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1958" target="_blank" rel="noopener"
 >「kubeletのPLEGをソースコード読んで理解したかった」&lt;/a>.
 &lt;a class="link" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/" target="_blank" rel="noopener"
 >Kubelet&lt;/a> has a lot of components, and one of the most important ones is PLEG, which stands for &amp;ldquo;Pod Lifecycle Event Generator&amp;rdquo;. In this article, we&amp;rsquo;ll look into the implementation to understand how PLEG works.&lt;/p>
@@ -1398,10 +1398,10 @@ Yeah, now we can see where &lt;code>PLEG is not healthy: pleg was last seen acti
 >here&lt;/a>.&lt;/p>
 &lt;p>It seems to be responsible for talking to Container Runtime and the main loop of kubelet, as shown below.&lt;/p>
 &lt;blockquote>
-&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg.png"
+&lt;p>&lt;img src="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/pleg.png"
 width="1206"
 height="886"
-srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_1024x0_resize_box_3.png 1024w"
+srcset="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_480x0_resize_box_3.png 480w, https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/pleg_hu198fe2aa39d96d5ee57c047fcc9cf0ca_184542_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="136"
@@ -1426,10 +1426,10 @@ data-flex-basis="326px"
 The design proposal is &lt;a class="link" href="https://github.com/kubernetes/design-proposals-archive/blob/main/node/runtime-pod-cache.md" target="_blank" rel="noopener"
 >here&lt;/a>.&lt;/p>
 &lt;blockquote>
-&lt;p>&lt;img src="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache.png"
+&lt;p>&lt;img src="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/runtimepodcache.png"
 width="1214"
 height="942"
-srcset="https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_1024x0_resize_box_3.png 1024w"
+srcset="https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_480x0_resize_box_3.png 480w, https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/runtimepodcache_hu640db9cf4b083a2ee3efc8fe86f47dbc_196885_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="128"
@@ -1455,17 +1455,17 @@ data-flex-basis="309px"
 &lt;/ul>
 &lt;h2 id="in-the-next-article">In the next article&amp;hellip;&lt;/h2>
 &lt;p>It might be sufficient to read the above for understanding, but the version of Kubernetes is a little old.
-Therefore, I&amp;rsquo;ll read the source code of Kubernetes 1.25 in the next.&lt;/p></description></item><item><title>Resource allocation to Kind nodes</title><link>https://nishipy.github.io/p/resource-allocation-to-kind-nodes/</link><pubDate>Sat, 21 Jan 2023 10:51:42 +0900</pubDate><guid>https://nishipy.github.io/p/resource-allocation-to-kind-nodes/</guid><description>&lt;img src="https://nishipy.github.io/p/resource-allocation-to-kind-nodes/logo.png" alt="Featured image of post Resource allocation to Kind nodes " />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1793" target="_blank" rel="noopener"
+Therefore, I&amp;rsquo;ll read the source code of Kubernetes 1.25 in the next.&lt;/p></description></item><item><title>Resource allocation to Kind nodes</title><link>https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/</link><pubDate>Sat, 21 Jan 2023 10:51:42 +0900</pubDate><guid>https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/</guid><description>&lt;img src="https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/logo.png" alt="Featured image of post Resource allocation to Kind nodes " />&lt;p>Note: This article is a translation of &lt;a class="link" href="https://nishipy.com/archives/1793" target="_blank" rel="noopener"
 >「kindでNodeに割り当てるリソースを定義する」&lt;/a>. I posted the original on Dec 18 2020, so some information might be old.&lt;/p>
 &lt;p>There are some famous tools to create local Kubernetes clusters. &lt;a class="link" href="https://github.com/kubernetes-sigs/kind" target="_blank" rel="noopener"
 >Kind&lt;/a> is one of them. In this post, I introduce the way to allocate compute resources(memory and/or CPU) to nodes of &lt;a class="link" href="https://github.com/kubernetes-sigs/kind" target="_blank" rel="noopener"
 >Kind&lt;/a>.&lt;/p>
 &lt;h2 id="adjust-resources-for-docker-desktop">Adjust resources for Docker Desktop&lt;/h2>
 &lt;p>When using Kind, each node of a Kubernetes cluster is built as a Docker container. Therefore, first, configure the resources available to Docker in the Docker Desktop settings. Set them to about 4 CPU cores and 8GB of memory, for instance.&lt;/p>
-&lt;p>&lt;img src="https://nishipy.github.io/p/resource-allocation-to-kind-nodes/docker-desktop-resources.png"
+&lt;p>&lt;img src="https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/docker-desktop-resources.png"
 width="1556"
 height="968"
-srcset="https://nishipy.github.io/p/resource-allocation-to-kind-nodes/docker-desktop-resources_hu13aed214bcfc6718d8b2b4bfea2628f3_98503_480x0_resize_box_3.png 480w, https://nishipy.github.io/p/resource-allocation-to-kind-nodes/docker-desktop-resources_hu13aed214bcfc6718d8b2b4bfea2628f3_98503_1024x0_resize_box_3.png 1024w"
+srcset="https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/docker-desktop-resources_hu13aed214bcfc6718d8b2b4bfea2628f3_98503_480x0_resize_box_3.png 480w, https://blog.nishipy.com/p/resource-allocation-to-kind-nodes/docker-desktop-resources_hu13aed214bcfc6718d8b2b4bfea2628f3_98503_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="160"
