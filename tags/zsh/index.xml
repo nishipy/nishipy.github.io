@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>zsh on /home/nishipy</title><link>https://blog.nishipy.com/tags/zsh/</link><description>Recent content in zsh on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 13 May 2024 01:00:00 +0900</lastBuildDate><atom:link href="https://blog.nishipy.com/tags/zsh/index.xml" rel="self" type="application/rss+xml"/><item><title>zsh + Powerlevel10kでVSCode内ターミナルのアイコンが表示されない件</title><link>https://blog.nishipy.com/p/powerline10k-vscode-terminal/</link><pubDate>Mon, 13 May 2024 01:00:00 +0900</pubDate><guid>https://blog.nishipy.com/p/powerline10k-vscode-terminal/</guid><description>&lt;img src="https://blog.nishipy.com/p/powerline10k-vscode-terminal/succeeded.jpg" alt="Featured image of post zsh + Powerlevel10kでVSCode内ターミナルのアイコンが表示されない件" />&lt;h2 id="vscodeのintegrated-terminalでアイコンが表示されない">VSCodeのIntegrated Terminalでアイコンが表示されない&lt;/h2>
+&lt;p>zsh + Powerlevel10k を使い始めたんですが、VSCode内のIntegrated Terminalでおしゃれなアイコンがうまく表示されずの地味に困りました。&lt;/p>
+&lt;p>&lt;img src="https://blog.nishipy.com/p/powerline10k-vscode-terminal/failed.jpg"
+width="728"
+height="268"
+srcset="https://blog.nishipy.com/p/powerline10k-vscode-terminal/failed_hu2bd4528fa2b7f2e08b9b7bdd71185d1d_42655_480x0_resize_q75_box.jpg 480w, https://blog.nishipy.com/p/powerline10k-vscode-terminal/failed_hu2bd4528fa2b7f2e08b9b7bdd71185d1d_42655_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="271"
+data-flex-basis="651px"
+>&lt;/p>
+&lt;h2 id="フォントを正しく指定しましょう">フォントを正しく指定しましょう&lt;/h2>
+&lt;p>この &lt;a class="link" href="https://gist.github.com/480/3b41f449686a089f34edb45d00672f28" target="_blank" rel="noopener"
+>gist&lt;/a> を参考にして、&lt;code>setting.json&lt;/code> に &lt;code>&amp;quot;terminal.integrated.fontFamily&amp;quot;: &amp;quot;MesloLGS NF&amp;quot;&lt;/code> を設定すれば上手くいきました。&lt;/p>
+&lt;p>&lt;img src="https://blog.nishipy.com/p/powerline10k-vscode-terminal/succeeded.jpg"
+width="682"
+height="218"
+srcset="https://blog.nishipy.com/p/powerline10k-vscode-terminal/succeeded_hucb3ca719ceef92b808c461955d967da8_35107_480x0_resize_q75_box.jpg 480w, https://blog.nishipy.com/p/powerline10k-vscode-terminal/succeeded_hucb3ca719ceef92b808c461955d967da8_35107_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="312"
+data-flex-basis="750px"
+>&lt;/p></description></item></channel></rss>
