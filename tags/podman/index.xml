@@ -1,4 +1,260 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>podman on /home/nishipy</title><link>https://blog.nishipy.com/tags/podman/</link><description>Recent content in podman on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 17 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.nishipy.com/tags/podman/index.xml" rel="self" type="application/rss+xml"/><item><title>Quadletイン・アクション</title><link>https://blog.nishipy.com/p/podman-quadlet/</link><pubDate>Sun, 17 Dec 2023 00:00:00 +0900</pubDate><guid>https://blog.nishipy.com/p/podman-quadlet/</guid><description>&lt;img src="https://blog.nishipy.com/p/podman-quadlet/seal.jpg" alt="Featured image of post Quadletイン・アクション" />&lt;p>Header Photo by &lt;a class="link" href="https://unsplash.com/@amyannaasher?utm_content=creditCopyText&amp;amp;utm_medium=referral&amp;amp;utm_source=unsplash" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>podman on /home/nishipy</title><link>https://blog.nishipy.com/tags/podman/</link><description>Recent content in podman on /home/nishipy</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 10 Sep 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.nishipy.com/tags/podman/index.xml" rel="self" type="application/rss+xml"/><item><title>oc-mirror v2で遊んでみた</title><link>https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/</link><pubDate>Tue, 10 Sep 2024 00:00:00 +0900</pubDate><guid>https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/</guid><description>&lt;img src="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/mirror.jpg" alt="Featured image of post oc-mirror v2で遊んでみた" />&lt;p>Header Photo by &lt;a class="link" href="https://unsplash.com/ja/@ivrn" target="_blank" rel="noopener"
+>Ivan Rohovchenko&lt;/a> on &lt;a class="link" href="https://unsplash.com/photos/black-telescope-during-day-time-8SjeH5pZbjw" target="_blank" rel="noopener"
+>Unsplash&lt;/a>&lt;/p>
+&lt;h2 id="oc-mirror-plugin-v2">oc-mirror plugin v2&lt;/h2>
+&lt;p>インターネット接続性のない環境では、OpenShiftのインストールに必要なコンテナイメージやOperatorが使うコンテナイメージを、Red Hatが公開するインターネット上のコンテナレジストリからミラーレジストリにミラーリングする必要があります。そんなときに便利なoc-mirror pluginですが、バグの多いの機能の改善や再実装、新機能の追加をした&lt;a class="link" href="https://github.com/openshift/oc-mirror/tree/main/v2" target="_blank" rel="noopener"
+>oc-mirror plugin v2&lt;/a>の開発が進められています。詳細は、&lt;a class="link" href="https://docs.openshift.com/container-platform/4.16/release_notes/ocp-4-16-release-notes.html#ocp-4-16-oc-mirror-v2_release-notes" target="_blank" rel="noopener"
+>OpenShift 4.16のリリースノートのこの辺り&lt;/a>をご確認ください。&lt;/p>
+&lt;p>なお、&lt;a class="link" href="https://docs.openshift.com/container-platform/4.16/installing/disconnected_install/about-installing-oc-mirror-v2.html" target="_blank" rel="noopener"
+>OpenShift 4.16時点では、oc-mirror plugin v2によるミラーリングはTech Preview&lt;/a>です。&lt;/p>
+&lt;p>今回は、oc-mirror plugin v2で追加された、ミラーレジストリ上にあるイメージ削除の機能で遊んでみたいと思います。&lt;/p>
+&lt;h2 id="oc-mirror-pluginによるミラーリングとイメージ削除">oc-mirror pluginによるミラーリングとイメージ削除&lt;/h2>
+&lt;p>従来のoc-mirror v1では、ミラーリング実行時に、前回までのミラーリングの履歴から自動でイメージをプルーニングするため、利用者が明示的にイメージを削除することはありませんでした。
+この挙動は一見便利そうですが、&lt;code>ImageSetConfiguration&lt;/code> という設定ファイルをわりと作成・更新しないと意図しないイメージを消してしまうこともしばしばありました。またバグが報告されることも多かったそうで、oc-mirror plugin v2では、自動でプルーニングを行わないように根本的に実装が見直されています。&lt;/p>
+&lt;h3 id="deleteimagesetconfiguration-の導入">&lt;code>DeleteImageSetConfiguration&lt;/code> の導入&lt;/h3>
+&lt;p>oc-mirror では、&lt;code>ImageSetConfiguration&lt;/code> という設定ファイルにミラーリング対象のコンテナイメージを定義していました。v1では、このファイルの変更履歴から削除対象となるイメージを自動で算出していたわけですが、v2からは &lt;code>DeleteImageSetConfiguration&lt;/code> が導入され、&lt;code>ImageSetConfiguration&lt;/code> と同じような書式で削除したいイメージを明示的に定義することができます。&lt;/p>
+&lt;h2 id="oc-mirror-v2でイメージ削除してみる">oc-mirror v2でイメージ削除してみる&lt;/h2>
+&lt;h3 id="イメージのミラーリング">イメージのミラーリング&lt;/h3>
+&lt;p>ミラーレジストリからイメージを削除してみたいのですが、そもそも消すイメージがないので、まずミラーリングを実行します。以下のような内容の &lt;code>ImageSetConfiguration&lt;/code> で、OpenShift 4.16.5 と 4.16.6のリリースイメージをミラーリングしてみます。v1と比較して、CRD(のようなもの)の&lt;code>kind&lt;/code>は同じですが、&lt;code>apiVersion&lt;/code> が異なるため注意してください。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ImageSetConfiguration&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mirror.openshift.io/v2alpha1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">mirror&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">platform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">channels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">stable-4.16&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">minVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">4.16.5&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">maxVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">4.16.6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>なお、ミラーレジストリには、&lt;a class="link" href="https://docs.openshift.com/container-platform/4.16/installing/disconnected_install/installing-mirroring-creating-registry.html" target="_blank" rel="noopener"
+>Mirror registry for Red Hat OpenShift&lt;/a>を使うのが簡単です。OpenShiftインストールのためのミラーリング用途限定で、PodmanでRed Hat Quayをデプロイしてくれます。この記事ではミラーレジストリの構築は省略します。&lt;/p>
+&lt;p>ミラーレジストリへログイン後、ミラーリングを実行します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ podman login registry.ocp4.tanishim.local:8443 -u init --authfile mirror-pull-secret.txt
+Password:
+Login Succeeded!
+$ oc mirror --v2 --authfile mirror-pull-secret.txt -c ./imagesetconfig.yaml --workspace file://./v2-workspace docker://registry.ocp4.tanishim.local:8443
+...
+2024/09/04 16:14:01 [INFO] : _ setting up the environment for you...
+2024/09/04 16:14:01 [INFO] : __ workflow mode: mirrorToMirror
+2024/09/04 16:14:01 [INFO] : _ going to discover the necessary images...
+2024/09/04 16:14:01 [INFO] : __ collecting release images...
+2024/09/04 16:14:02 [INFO] : __ collecting operator images...
+2024/09/04 16:14:02 [INFO] : __ collecting additional images...
+2024/09/04 16:14:02 [INFO] : __ Start copying the images...
+2024/09/04 16:14:05 [INFO] : === Overall Progress - image 1 / 384 ===
+2024/09/04 16:14:05 [INFO] : release image 1 / 384
+2024/09/04 16:14:05 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5bb98edf376dfa838ce6899b0fc0e867237f34df63e8bf476d0ba9d2195131bd
+2024/09/04 16:14:05 [INFO] : =========================================
+2024/09/04 16:14:07 [INFO] : === Overall Progress - image 2 / 384 ===
+2024/09/04 16:14:07 [INFO] : release image 2 / 384
+2024/09/04 16:14:07 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6a8a7825b2039759548c6d83db384979cf4bf0a17d231c2a588c57e80623f74c
+2024/09/04 16:14:07 [INFO] : =========================================
+2024/09/04 16:14:15 [INFO] : === Overall Progress - image 3 / 384 ===
+2024/09/04 16:14:15 [INFO] : release image 3 / 384
+2024/09/04 16:14:15 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:667efccd05c2154ebda8ae7a14fbb3ed4523ad8c1f459df9eda77a041239ae1c
+2024/09/04 16:14:15 [INFO] : =========================================
+2024/09/04 16:14:19 [INFO] : === Overall Progress - image 4 / 384 ===
+2024/09/04 16:14:19 [INFO] : release image 4 / 384
+2024/09/04 16:14:19 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:355407f1b51db63278a581de341542521972e68c607a0e10f521733795619214
+2024/09/04 16:14:19 [INFO] : =========================================
+2024/09/04 16:14:26 [INFO] : === Overall Progress - image 5 / 384 ===
+2024/09/04 16:14:26 [INFO] : release image 5 / 384
+2024/09/04 16:14:26 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:041d983c6807129d0e0cf371133f8a1c0d5fde78a813c60aa1f293e64004fb43
+2024/09/04 16:14:26 [INFO] : =========================================
+__2024/09/04 16:14:31 [INFO] : === Overall Progress - image 6 / 384 ===
+2024/09/04 16:14:31 [INFO] : release image 6 / 384
+...
+2024/09/04 17:58:09 [INFO] : === Overall Progress - image 384 / 384 ===
+2024/09/04 17:58:09 [INFO] : release image 384 / 384
+2024/09/04 17:58:09 [INFO] : image: quay.io/openshift-release-dev/ocp-release:4.16.5-x86_64
+2024/09/04 17:58:09 [INFO] : ===========================================
+2024/09/04 17:58:09 [INFO] : === Results ===
+2024/09/04 17:58:09 [INFO] : All release images mirrored successfully 384 / 384 __
+2024/09/04 17:58:09 [INFO] : __ Generating IDMS file...
+2024/09/04 17:58:09 [INFO] : v2-workspace/working-dir/cluster-resources/idms-oc-mirror.yaml file created
+2024/09/04 17:58:09 [INFO] : __ Generating ITMS file...
+2024/09/04 17:58:09 [INFO] : v2-workspace/working-dir/cluster-resources/itms-oc-mirror.yaml file created
+2024/09/04 17:58:09 [INFO] : __ No catalogs mirrored. Skipping CatalogSource file generation.
+2024/09/04 17:58:09 [INFO] : mirror time : 1h44m7.951974594s
+2024/09/04 17:58:09 [INFO] : __ Goodbye, thank you for using oc-mirror
+&lt;/code>&lt;/pre>&lt;p>oc-mirrorを使ったことがある方ならわかると思いますが、標準出力されるログの見やすさが桁違いです。プログレスバーのように、ミラーリングの進捗がわかりやすいですし、タイムスタンプも有用です。
+&lt;code>--workspace&lt;/code> というフラグはoc-mirror v2で追加された便利機能の1つです。指定したディレクトリに、こんな感じでアーティファクトが生成されていました。ログやミラーしたOperator、OpenShift リリースの情報、インストール後クラスタに適用する &lt;code>ImageDigestMirrorSet&lt;/code> および &lt;code>ImageTagMirrorSet&lt;/code> のYAMLマニフェストが入ります&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ tree v2-workspace/ -d
+v2-workspace/
+`-- working-dir
+|-- cluster-resources
+|-- hold-operator
+|-- hold-release
+| `-- ocp-release
+| |-- 4.16.5-x86_64
+| | `-- release-manifests
+| `-- 4.16.6-x86_64
+| `-- release-manifests
+|-- info
+|-- logs
+|-- release-filters
+|-- release-images
+| `-- ocp-release
+| |-- 4.16.5-x86_64
+| | `-- blobs
+| | `-- sha256
+| `-- 4.16.6-x86_64
+| `-- blobs
+| `-- sha256
+`-- signatures
+&lt;/code>&lt;/pre>&lt;pre tabindex="0">&lt;code>$ cat v2-workspace/working-dir/cluster-resources/*.yaml
+---
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+name: idms-release-0
+spec:
+imageDigestMirrors:
+- mirrors:
+- registry.ocp4.tanishim.local:8443/openshift-release-dev
+source: quay.io/openshift-release-dev
+status: {}
+---
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+name: itms-release-0
+spec:
+imageTagMirrors:
+- mirrors:
+- registry.ocp4.tanishim.local:8443/openshift-release-dev
+source: quay.io/openshift-release-dev
+status: {}
+&lt;/code>&lt;/pre>&lt;p>Mirror Registry側を念の為確認すると、今回ミラーリングしたOCP 4.16.5と4.16.6 のリリースイメージが入っています。&lt;/p>
+&lt;p>&lt;img src="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag_history_1.jpg"
+width="2602"
+height="1068"
+srcset="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag_history_1_hu0533df8c600b6ebf5e775c57536fef00_178874_480x0_resize_q75_box.jpg 480w, https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag_history_1_hu0533df8c600b6ebf5e775c57536fef00_178874_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="584px"
+>&lt;/p>
+&lt;h3 id="deleteimagesetconfiguration-によるイメージの削除">&lt;code>DeleteImageSetConfiguration&lt;/code> によるイメージの削除&lt;/h3>
+&lt;p>いよいよ本題です。4.16.5用のイメージだけを削除してみます。以下の内容で作成した &lt;code>DeleteImageSetConfiguration&lt;/code> と先ほどミラーリングした際に生成されたメタデータを読み込んで、イメージ削除に必要な設定ファイルを生成します。&lt;code>oc mirror delete&lt;/code> コマンドに &lt;code>--generate&lt;/code> フラグをつけるという、なんともややこしい感じです。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mirror.openshift.io/v2alpha1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">DeleteImageSetConfiguration&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">delete&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">platform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">channels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">stable-4.16&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">minVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">4.16.5&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">maxVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">4.16.5&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;pre tabindex="0">&lt;code>$ oc mirror --v2 delete --generate --authfile mirror-pull-secret.txt --config deleteimagesetconfig.yaml --workspace file://./v2-workspace docker://registry.ocp4.tanishim.local:8443
+2024/09/05 15:48:04 [WARN] : _ --v2 flag identified, flow redirected to the oc-mirror v2 version. This is Tech Preview, it is still under development and it is not production ready.
+2024/09/05 15:48:04 [INFO] : __ Hello, welcome to oc-mirror
+2024/09/05 15:48:04 [INFO] : _ setting up the environment for you...
+2024/09/05 15:48:04 [INFO] : __ workflow mode: mirrorToMirror / delete
+2024/09/05 15:48:04 [INFO] : _ going to discover the necessary images...
+2024/09/05 15:48:04 [INFO] : __ collecting release images...
+2024/09/05 15:48:04 [INFO] : __ collecting operator images...
+2024/09/05 15:48:04 [INFO] : __ collecting additional images...
+2024/09/05 15:48:04 [INFO] : __ Generating delete file...
+2024/09/05 15:48:04 [INFO] : v2-workspace/working-dir/delete file created
+v2-workspace/working-dir/delete2024/09/05 15:49:31 [INFO] : delete time : 1m26.960963111s
+2024/09/05 15:49:31 [INFO] : __ Goodbye, thank you for using oc-mirror
+&lt;/code>&lt;/pre>&lt;p>&lt;code>v2-workspace/working-dir/delete&lt;/code> に何か作ってくれたようです。見てみましょう。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ ls v2-workspace/working-dir/delete
+delete-images.yaml delete-imageset-config.yaml
+$ cat v2-workspace/working-dir/delete/delete-imageset-config.yaml
+apiVersion: mirror.openshift.io/v2alpha1
+delete:
+helm: {}
+platform:
+architectures:
+- amd64
+channels:
+- maxVersion: 4.16.5
+minVersion: 4.16.5
+name: stable-4.16
+type: ocp
+kind: DeleteImageSetConfiguration
+$ cat v2-workspace/working-dir/delete/delete-images.yaml
+...
+- imageName: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ffeb6edc9f09e75011c3547b2149b8120c68e7721d8ba2e7a6d659e6c83229bc
+imageReference: docker://registry.ocp4.tanishim.local:8443/openshift-release-dev/ocp-v4.0-art-dev@sha256:ffeb6edc9f09e75011c3547b2149b8120c68e7721d8ba2e7a6d659e6c83229bc
+relatedBlobs:
+- sha256:86592d87dea5f0c55992dc4aadd236cde96f5e4f3d3dfd0456ca38dca2d2e151
+- sha256:9a0e86afac7b17960e2411a55e234d639aead65defac982719003eaa242da807
+- sha256:b958cf13e572cbd92209b5c01a8e65203cf88c4b017258ec8ff9bfd5d722b715
+- sha256:ca1636478fe5b8e2a56600e24d6759147feb15020824334f4a798c1cb6ed58e2
+- sha256:e5e8178c6af6b5832361eb52e25232f851a6979c63bbad694e063afdd71ca459
+- sha256:ffeb6edc9f09e75011c3547b2149b8120c68e7721d8ba2e7a6d659e6c83229bc
+kind: DeleteImageList
+&lt;/code>&lt;/pre>&lt;p>&lt;code>DeleteImageSetConfiguration&lt;/code> と &lt;code>DeleteImageList&lt;/code> のマニフェストが作成されています。前者は先ほど自分で与えたファイルと同じ内容です。後者は、それを元に実際に削除対象となるイメージとダイジェストをリストにしたもののようです。この段階ではイメージの削除は行われていません。先ほど生成された &lt;code>DeleteImageList&lt;/code> のYAMLファイル &lt;code>delete-images.yaml&lt;/code>を使って削除処理を実行します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ oc mirror --v2 delete --authfile mirror-pull-secret.txt --delete-yaml-file ./v2-workspace/working-dir/delete/delete-images.yaml docker://registry.ocp4.tanishim.local:8443
+...
+2024/09/05 16:01:03 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ffbe0d4c61d5a2e42923b1d063179bbd99fe2bf7a679c5a2f1ae444ba0d5d6c6
+2024/09/05 16:01:03 [INFO] : ===========================================
+2024/09/05 16:01:03 [INFO] : === Overall Progress - image 192 / 192 ===
+2024/09/05 16:01:03 [INFO] : image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ffeb6edc9f09e75011c3547b2149b8120c68e7721d8ba2e7a6d659e6c83229bc
+2024/09/05 16:01:03 [INFO] : ===========================================
+2024/09/05 16:01:03 [INFO] : === Results ===
+2024/09/05 16:01:03 [INFO] : All images deleted successfully 192 / 192 __
+2024/09/05 16:01:03 [INFO] : delete time : 1m33.308334555s
+2024/09/05 16:01:03 [INFO] : __ Remember to execute a garbage collect (or similar) on your remote repository
+2024/09/05 16:01:03 [INFO] : __ Goodbye, thank you for using oc-mirror
+&lt;/code>&lt;/pre>&lt;p>完了後、ミラーレジストリを見てみると、期待した通り、4.16.5のリリースイメージ(のタグ)だけが削除されたことが確認できます。&lt;/p>
+&lt;p>&lt;img src="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-2.jpg"
+width="2542"
+height="844"
+srcset="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-2_hu0533df8c600b6ebf5e775c57536fef00_127757_480x0_resize_q75_box.jpg 480w, https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-2_hu0533df8c600b6ebf5e775c57536fef00_127757_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="301"
+data-flex-basis="722px"
+>&lt;/p>
+&lt;p>&lt;img src="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-3.jpg"
+width="2684"
+height="1204"
+srcset="https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-3_hu0533df8c600b6ebf5e775c57536fef00_216348_480x0_resize_q75_box.jpg 480w, https://blog.nishipy.com/p/oc-mirror-v2-image-deletion/tag-history-3_hu0533df8c600b6ebf5e775c57536fef00_216348_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="222"
+data-flex-basis="535px"
+>&lt;/p>
+&lt;h2 id="余談">余談&lt;/h2>
+&lt;h3 id="oc-mirror-v2のイメージ削除の注意点">oc-mirror v2のイメージ削除の注意点&lt;/h3>
+&lt;p>oc-mirror v2の新機能である &lt;code>DeleteImageSetConfiguration&lt;/code> によるイメージ削除では、イメージのマニフェストのみを削除しています。そのため、ストレージの使用量は減りません。不要なイメージの実体を削除し、ストレージを空けたい場合は、コンテナレジストリ側でガーベージコレクションを有効にしてください。なお、&lt;a class="link" href="https://docs.redhat.com/en/documentation/red_hat_quay/3/html/manage_red_hat_quay/garbage-collection#garbage-collection-configuration-fields" target="_blank" rel="noopener"
+>Red Hat Quay では、ガーベージコレクションはデフォルトで有効&lt;/a>になっています。今回使ったOpenShift Mirror Registryも中身はQuayなので同様です。&lt;/p>
+&lt;h3 id="oc-mirror-on-rhel-8">oc-mirror on RHEL 8&lt;/h3>
+&lt;p>最近のバージョンのoc-mirrorをRHEL 8で実行しようとすると、以下のようなエラーが出るかもしれません。&lt;/p>
+&lt;pre tabindex="0">&lt;code>/lib64/libc.so.6: version `GLIBC_2.33&amp;#39; not found
+&lt;/code>&lt;/pre>&lt;p>RHEL 8の&lt;code>glibc&lt;/code> のバージョンが、&lt;code>glibc-2.28&lt;/code> であるためです。このような場合、RHEL 8のマシンでUBI 9なPodmanコンテナで一時対処する方法があります。以下のようにコンテナを実行し、bashセッションを起動して、oc-mirrorを試せばよいでしょう。必要であれば、ホストOS上にあるミラーレジストリのプルシークレットやCA証明書をコピーします。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ podman run -dt -v ./:/oc-mirror:Z --name ubi9 registry.redhat.io/ubi9
+$ podman exec -it ubi9 /bin/bash
+&lt;/code>&lt;/pre></description></item><item><title>Quadletイン・アクション</title><link>https://blog.nishipy.com/p/podman-quadlet/</link><pubDate>Sun, 17 Dec 2023 00:00:00 +0900</pubDate><guid>https://blog.nishipy.com/p/podman-quadlet/</guid><description>&lt;img src="https://blog.nishipy.com/p/podman-quadlet/seal.jpg" alt="Featured image of post Quadletイン・アクション" />&lt;p>Header Photo by &lt;a class="link" href="https://unsplash.com/@amyannaasher?utm_content=creditCopyText&amp;amp;utm_medium=referral&amp;amp;utm_source=unsplash" target="_blank" rel="noopener"
 >Amy Asher&lt;/a> on &lt;a class="link" href="https://unsplash.com/photos/white-seal-on-soil-giZJHm2m9yY?utm_content=creditCopyText&amp;amp;utm_medium=referral&amp;amp;utm_source=unsplash" target="_blank" rel="noopener"
 >Unsplash&lt;/a>&lt;/p>
 &lt;h2 id="-はじめに">🦭 はじめに&lt;/h2>
